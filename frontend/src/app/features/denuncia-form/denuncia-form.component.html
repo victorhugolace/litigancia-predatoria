@@ -1,0 +1,214 @@
+<div class="form-page" *ngIf="!protocoloGerado(); else confirmacao">
+
+  <header class="form-page__header">
+    <span class="form-page__eyebrow">Alerta de Litigância Predatória</span>
+    <h1>Reportar padrão suspeito</h1>
+    <p class="form-page__lede">
+      Preencha os quatro blocos abaixo. Os dados alimentam diretamente o cruzamento feito pela
+      Gerência de Dados e pelo NUMOPED — quanto mais precisos os campos de identificação da OAB
+      e dos processos paradigmas, mais rápida a triagem.
+    </p>
+  </header>
+
+  <div class="lp-notice-box">
+    A presente consulta não retornará qualquer resultado em caso de informações prestadas incorretamente ou de processos sob segredo de justiça, conforme art. 1º, parágrafo único, da <strong>Resolução nº 121 do Conselho Nacional de Justiça</strong>.
+  </div>
+
+  <ol class="stepper">
+    <li *ngFor="let step of steps; let i = index"
+        class="stepper__item"
+        [class.is-active]="currentStep() === i"
+        [class.is-done]="currentStep() > i"
+        (click)="irParaPasso(i)">
+      <span class="stepper__badge">{{ i + 1 }}</span>
+      <span class="stepper__label">
+        <small>{{ step.eyebrow }}</small>
+        {{ step.titulo }}
+      </span>
+    </li>
+  </ol>
+
+
+  <form [formGroup]="form" class="lp-card form-card" (ngSubmit)="enviar()">
+
+    <!-- Passo 1: Identificação da origem -->
+    <section class="form-step" *ngIf="currentStep() === 0">
+      <h2>Identificação da origem</h2>
+      <p class="form-step__hint">Se estiver logado na intranet, esses dados normalmente já vêm preenchidos.</p>
+
+      <div class="field">
+        <label for="comarca">Comarca / Unidade Judiciária</label>
+        <input id="comarca" type="text" formControlName="comarca" placeholder="Ex.: João Pessoa">
+        <span class="field__error" *ngIf="form.get('comarca')?.touched && form.get('comarca')?.invalid">
+          Informe a comarca ou unidade judiciária.
+        </span>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="nomeComunicante">Nome do comunicante</label>
+          <input id="nomeComunicante" type="text" formControlName="nomeComunicante" placeholder="Ex.: Juiz(a) titular da 3ª Vara">
+          <span class="field__error" *ngIf="form.get('nomeComunicante')?.touched && form.get('nomeComunicante')?.invalid">
+            Informe o nome do comunicante.
+          </span>
+        </div>
+        <div class="field">
+          <label for="matriculaComunicante">Matrícula</label>
+          <input id="matriculaComunicante" type="text" formControlName="matriculaComunicante" placeholder="Ex.: MAT2201">
+          <span class="field__error" *ngIf="form.get('matriculaComunicante')?.touched && form.get('matriculaComunicante')?.invalid">
+            Essencial para a Corregedoria dar a devolutiva depois.
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Passo 2: Alvo da suspeita -->
+    <section class="form-step" *ngIf="currentStep() === 1">
+      <h2>Alvo da suspeita</h2>
+      <p class="form-step__hint">O preenchimento exato é o principal gatilho de busca dos scripts da Gerência de Dados.</p>
+
+      <div class="field">
+        <label for="oabAdvogado">Número da OAB do(a) advogado(a) *</label>
+        <input id="oabAdvogado" type="text" formControlName="oabAdvogado" placeholder="Ex.: PB12345">
+        <span class="field__error" *ngIf="form.get('oabAdvogado')?.touched && form.get('oabAdvogado')?.invalid">
+          Campo obrigatório — é o principal gatilho de busca.
+        </span>
+      </div>
+
+      <div class="field">
+        <label for="cpfCnpjParte">CPF / CNPJ da parte autora ou ré <em>(opcional)</em></label>
+        <input id="cpfCnpjParte"
+               type="text"
+               formControlName="cpfCnpjParte"
+               (input)="aplicarMascaraCpfCnpj($event)"
+               maxlength="18"
+               placeholder="000.000.000-00 ou 00.000.000/0000-00">
+      </div>
+    </section>
+
+    <!-- Passo 3: Tipologia -->
+    <section class="form-step" *ngIf="currentStep() === 2">
+      <h2>Tipologia da ação</h2>
+      <p class="form-step__hint">Seleção única — é o campo mais importante para gerar os gráficos e identificar o modus operandi.</p>
+
+      <div class="tipologia-options">
+        <label class="tipologia-option" *ngFor="let opt of tipologiaOptions"
+               [class.is-selected]="form.get('tipologia')?.value === opt.valor">
+          <input type="radio" [value]="opt.valor" formControlName="tipologia">
+          <span>{{ opt.label }}</span>
+        </label>
+      </div>
+      <span class="field__error" *ngIf="form.get('tipologia')?.touched && form.get('tipologia')?.invalid">
+        Selecione uma tipologia.
+      </span>
+
+      <div class="field" *ngIf="isOutros">
+        <label for="tipologiaOutros">Descreva a tipologia observada</label>
+        <input id="tipologiaOutros" type="text" formControlName="tipologiaOutros" maxlength="120" placeholder="Breve descrição, apenas para esta opção">
+      </div>
+    </section>
+
+    <!-- Passo 4: Materialidade -->
+    <section class="form-step" *ngIf="currentStep() === 3">
+      <h2>Materialidade das evidências</h2>
+      <p class="form-step__hint">
+        Informe de 3 a 5 processos paradigmas com máscara CNJ. A obrigatoriedade evita denúncias
+        baseadas em intuição e demonstra a repetição do padrão.
+      </p>
+
+      <div class="processos" formArrayName="processosParadigmas">
+        <div class="processo-row" *ngFor="let ctrl of processosArray.controls; let i = index">
+          <span class="processo-row__index">{{ i + 1 }}</span>
+          <input type="text"
+                 [formControlName]="i"
+                 (input)="aplicarMascaraCNJ(i, $event)"
+                 maxlength="25"
+                 placeholder="NNNNNNN-DD.AAAA.J.TR.OOOO">
+          <button type="button" class="processo-row__remove" *ngIf="processosArray.length > 3"
+                  (click)="removerProcesso(i)" aria-label="Remover processo">✕</button>
+          <span class="field__error" *ngIf="ctrl.touched && ctrl.invalid">Use a máscara CNJ completa.</span>
+        </div>
+      </div>
+      <button type="button" class="lp-btn lp-btn--ghost add-processo" *ngIf="processosArray.length < 5" (click)="adicionarProcesso()">
+        + Adicionar processo paradigma
+      </button>
+
+      <div class="field">
+        <label for="relato">Breve relato do padrão observado</label>
+        <textarea id="relato" formControlName="relato" rows="4" maxlength="500"
+                   placeholder="Ex.: Todos os comprovantes de energia têm a mesma data de vencimento e tipografia alterada."></textarea>
+        <div class="field__meta">
+          <span class="field__error" *ngIf="form.get('relato')?.touched && form.get('relato')?.invalid">
+            Descreva brevemente o padrão observado (até 500 caracteres).
+          </span>
+          <span class="field__counter">{{ relatoRestante }} caracteres restantes</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Anexar documentos comprobatórios <em>(opcional)</em></label>
+        <div class="file-upload-zone"
+             [class.is-dragging]="isDragging()"
+             (dragover)="onDragOver($event)"
+             (dragleave)="onDragLeave($event)"
+             (drop)="onDrop($event)"
+             (click)="fileInput.click()">
+          <input #fileInput type="file" multiple accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" (change)="onFileSelected($event)" style="display: none;">
+          
+          <div class="file-upload-zone__content">
+            <svg class="file-upload-zone__icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="17 8 12 3 7 8"/>
+              <line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+            <strong>Clique aqui para selecionar ou arraste seus arquivos</strong>
+            <p>Formato aceito: PDFs, documentos DOCX ou imagens (até 10MB por arquivo)</p>
+          </div>
+        </div>
+
+        <div class="file-list" *ngIf="arquivosAnexados().length > 0">
+          <div class="file-item" *ngFor="let file of arquivosAnexados(); let i = index">
+            <div class="file-item__info">
+              <span class="file-item__icon">📎</span>
+              <span class="file-item__name">{{ file.name }}</span>
+              <span class="file-item__size">({{ formatarTamanhoArquivo(file.size) }})</span>
+            </div>
+            <button type="button" class="file-item__remove" (click)="removerAnexo(i); $event.stopPropagation()" aria-label="Remover arquivo">✕</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="form-card__error" *ngIf="erroEnvio()">{{ erroEnvio() }}</div>
+
+    <footer class="form-card__footer">
+      <button type="button" class="lp-btn lp-btn--ghost" (click)="irParaAnterior()" [disabled]="currentStep() === 0">
+        Voltar
+      </button>
+
+      <button type="button" class="lp-btn lp-btn--primary" *ngIf="currentStep() < steps.length - 1" (click)="irParaProximo()">
+        Continuar
+      </button>
+
+      <button type="submit" class="lp-btn lp-btn--gold" *ngIf="currentStep() === steps.length - 1" [disabled]="enviando()">
+        {{ enviando() ? 'Enviando...' : 'Registrar denúncia' }}
+      </button>
+    </footer>
+  </form>
+</div>
+
+<ng-template #confirmacao>
+  <div class="confirmation lp-card">
+    <span class="confirmation__seal">✓</span>
+    <h1>Denúncia registrada</h1>
+    <p>
+      O Centro de Inteligência foi notificado. Acompanhe pelo número de protocolo abaixo —
+      a Corregedoria enviará uma devolutiva assim que a triagem for concluída.
+    </p>
+    <div class="confirmation__protocolo">{{ protocoloGerado() }}</div>
+    <div class="confirmation__actions">
+      <button class="lp-btn lp-btn--ghost" (click)="registrarNova()">Registrar outra denúncia</button>
+      <button class="lp-btn lp-btn--primary" (click)="irParaPainel()">Ver painel de controle</button>
+    </div>
+  </div>
+</ng-template>

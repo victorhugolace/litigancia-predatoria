@@ -1,0 +1,6 @@
+// Estilos específicos do shell já centralizados em styles.scss (.shell*)
+// Este arquivo existe para permitir estilos futuros isolados ao AppComponent.
+:host {
+  display: block;
+  height: 100%;
+}

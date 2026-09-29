@@ -1,0 +1,17 @@
+# Cache do Angular e do projeto
+.angular/
+frontend/.angular/
+backend/.angular/
+
+# Dependências Node
+node_modules/
+**/node_modules/
+
+# Compilações e Builds
+dist/
+**/dist/
+
+# Outros temporários e senhas
+.env
+.vscode/
+*.log

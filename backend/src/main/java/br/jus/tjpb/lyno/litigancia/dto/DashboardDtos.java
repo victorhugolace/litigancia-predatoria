@@ -1,0 +1,71 @@
+package br.jus.tjpb.lyno.litigancia.dto;
+
+import java.time.LocalDate;
+
+public class DashboardDtos {
+
+    public static class KpisResponse {
+        public long totalDenuncias;
+        public long volumeProcessualAfetado;
+        public long comarcasAfetadas;
+
+        public KpisResponse(long totalDenuncias, long volumeProcessualAfetado, long comarcasAfetadas) {
+            this.totalDenuncias = totalDenuncias;
+            this.volumeProcessualAfetado = volumeProcessualAfetado;
+            this.comarcasAfetadas = comarcasAfetadas;
+        }
+    }
+
+    public static class RankingItem {
+        public String oabAdvogado;
+        public long totalDenuncias;
+        public long comarcasEnvolvidas;
+
+        public RankingItem(String oabAdvogado, long totalDenuncias, long comarcasEnvolvidas) {
+            this.oabAdvogado = oabAdvogado;
+            this.totalDenuncias = totalDenuncias;
+            this.comarcasEnvolvidas = comarcasEnvolvidas;
+        }
+    }
+
+    public static class TipologiaItem {
+        public String tipologia;
+        public String descricao;
+        public long total;
+        public double percentual;
+
+        public TipologiaItem(String tipologia, String descricao, long total, double percentual) {
+            this.tipologia = tipologia;
+            this.descricao = descricao;
+            this.total = total;
+            this.percentual = percentual;
+        }
+    }
+
+    public static class ComarcaItem {
+        public String comarca;
+        public long total;
+
+        public ComarcaItem(String comarca, long total) {
+            this.comarca = comarca;
+            this.total = total;
+        }
+    }
+
+    public static class TendenciaItem {
+        public LocalDate semana;
+        public long total;
+
+        public TendenciaItem(LocalDate semana, long total) {
+            this.semana = semana;
+            this.total = total;
+        }
+    }
+
+    public static class StatusUpdateRequest {
+        public br.jus.tjpb.lyno.litigancia.model.StatusDenuncia status;
+        public Integer volumeProcessualEstimado;
+        public Integer comarcasAtingidas;
+        public String notaTecnicaResumo;
+    }
+}

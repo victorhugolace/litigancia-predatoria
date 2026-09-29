@@ -1,0 +1,48 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: litigancia-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: litigancia_predatoria
+      POSTGRES_USER: lyno
+      POSTGRES_PASSWORD: lyno
+    ports:
+      - "5432:5432"
+    volumes:
+      - litigancia_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lyno -d litigancia_predatoria"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: ./backend
+    container_name: litigancia-backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: litigancia_predatoria
+      DB_USER: lyno
+      DB_PASSWORD: lyno
+    ports:
+      - "8080:8080"
+
+  frontend:
+    build: ./frontend
+    container_name: litigancia-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "4200:80"
+
+volumes:
+  litigancia_pgdata:

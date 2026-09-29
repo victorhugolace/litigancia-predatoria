@@ -1,0 +1,161 @@
+<div class="dash">
+
+  <header class="dash__header">
+    <span class="dash__eyebrow">Centro de Inteligência</span>
+    <h1>Painel de Litigância Predatória</h1>
+    <p class="dash__lede">
+      Se você abrisse o computador nesta segunda-feira, qual número precisaria estar piscando em
+      vermelho para você tomar uma atitude imediata?
+    </p>
+  </header>
+
+  <div class="dash__loading" *ngIf="carregando()">Carregando dados do painel…</div>
+
+  <ng-container *ngIf="!carregando()">
+
+    <!-- Visão Executiva -->
+    <section class="kpi-row">
+      <div class="lp-card kpi-card">
+        <span class="kpi-card__label">Total de denúncias</span>
+        <strong class="kpi-card__value">{{ kpis()?.totalDenuncias ?? 0 }}</strong>
+        <span class="kpi-card__hint">Últimos 12 meses</span>
+      </div>
+      <div class="lp-card kpi-card kpi-card--alert">
+        <span class="kpi-card__label">Volume processual afetado</span>
+        <strong class="kpi-card__value">{{ kpis()?.volumeProcessualAfetado ?? 0 }}</strong>
+        <span class="kpi-card__hint">Processos estimados contaminados</span>
+      </div>
+      <div class="lp-card kpi-card">
+        <span class="kpi-card__label">Comarcas afetadas</span>
+        <strong class="kpi-card__value">{{ kpis()?.comarcasAfetadas ?? 0 }}</strong>
+        <span class="kpi-card__hint">Sobre 20 comarcas monitoradas</span>
+      </div>
+    </section>
+
+    <!-- Ranking de reincidência -->
+    <section class="lp-card panel">
+      <div class="panel__header">
+        <h2>Ranking de reincidência (Top 10)</h2>
+        <span class="panel__hint">Principal gatilho para a Corregedoria agir</span>
+      </div>
+      <table class="ranking-table">
+        <thead>
+          <tr><th>#</th><th>OAB / CNPJ</th><th>Denúncias</th><th>Comarcas envolvidas</th></tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of ranking(); let i = index">
+            <td class="ranking-table__pos">{{ i + 1 }}</td>
+            <td class="ranking-table__oab">{{ item.oabAdvogado }}</td>
+            <td>{{ item.totalDenuncias }}</td>
+            <td>{{ item.comarcasEnvolvidas }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Visão Geográfica e Comportamental -->
+    <div class="dash__grid">
+      <section class="lp-card panel">
+        <div class="panel__header">
+          <h2>Concentração por comarca</h2>
+          <span class="panel__hint">Onde focar correições extraordinárias</span>
+        </div>
+        <div class="heatmap">
+          <div class="heatmap__row" *ngFor="let c of comarcas()">
+            <span class="heatmap__label">{{ c.comarca }}</span>
+            <div class="heatmap__bar-track">
+              <div class="heatmap__bar"
+                   [style.width.%]="intensidade(c.total)"
+                   [style.background]="'rgba(192, 57, 43,' + (0.25 + intensidade(c.total)/130) + ')'">
+              </div>
+            </div>
+            <span class="heatmap__value">{{ c.total }}</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="lp-card panel">
+        <div class="panel__header">
+          <h2>Tipologia predominante</h2>
+          <span class="panel__hint">Orienta as Notas Técnicas do Centro de Inteligência</span>
+        </div>
+        <div class="chart-box">
+          <canvas #tipologiaCanvas></canvas>
+        </div>
+      </section>
+    </div>
+
+    <section class="lp-card panel">
+      <div class="panel__header">
+        <h2>Tendência semanal de alertas</h2>
+        <span class="panel__hint">A linha precisa cair após um Provimento da Corregedoria</span>
+      </div>
+      <div class="chart-box chart-box--wide">
+        <canvas #tendenciaCanvas></canvas>
+      </div>
+    </section>
+
+    <!-- Visão Operacional (Kanban) -->
+    <section class="panel-header-standalone">
+      <h2>Fila de trabalho</h2>
+      <span class="panel__hint">Clique em uma denúncia para ver os detalhes informados no formulário</span>
+    </section>
+
+    <div class="kanban">
+      <div class="kanban__column" *ngFor="let status of statusOrder">
+        <div class="kanban__column-header">
+          <span>{{ statusLabels[status] }}</span>
+          <span class="kanban__count">{{ denunciasPorStatus(status).length }}</span>
+        </div>
+        <div class="kanban__cards">
+          <button class="kanban__card" *ngFor="let d of denunciasPorStatus(status)" (click)="abrirDrillDown(d)">
+            <span class="kanban__card-protocolo">{{ d.numeroProtocolo }}</span>
+            <span class="kanban__card-oab">OAB {{ d.oabAdvogado }}</span>
+            <span class="kanban__card-tipologia">{{ d.tipologiaDescricao }}</span>
+            <span class="kanban__card-comarca">{{ d.comarca }}</span>
+          </button>
+          <p class="kanban__empty" *ngIf="denunciasPorStatus(status).length === 0">Sem denúncias nesta etapa.</p>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</div>
+
+<!-- Drill-down modal -->
+<div class="drilldown-overlay" *ngIf="denunciaSelecionada() as d" (click)="fecharDrillDown()">
+  <div class="drilldown lp-card" (click)="$event.stopPropagation()">
+    <header class="drilldown__header">
+      <div>
+        <span class="drilldown__protocolo">{{ d.numeroProtocolo }}</span>
+        <h2>{{ d.tipologiaDescricao }}</h2>
+      </div>
+      <button class="drilldown__close" (click)="fecharDrillDown()" aria-label="Fechar">✕</button>
+    </header>
+
+    <div class="drilldown__meta">
+      <div><span>Comarca</span><strong>{{ d.comarca }}</strong></div>
+      <div><span>OAB suspeita</span><strong>{{ d.oabAdvogado }}</strong></div>
+      <div><span>Status</span><strong>{{ d.statusDescricao }}</strong></div>
+      <div><span>Comunicante</span><strong>{{ d.nomeComunicante }}</strong></div>
+      <div><span>Registrado em</span><strong>{{ formatarData(d.dataCriacao) }}</strong></div>
+      <div *ngIf="d.volumeProcessualEstimado"><span>Volume estimado</span><strong>{{ d.volumeProcessualEstimado }} processos</strong></div>
+    </div>
+
+    <div class="drilldown__section">
+      <h3>Breve relato do padrão observado</h3>
+      <p>{{ d.relato }}</p>
+    </div>
+
+    <div class="drilldown__section">
+      <h3>Processos paradigmas</h3>
+      <ul class="drilldown__processos">
+        <li *ngFor="let p of d.processosParadigmas">{{ p }}</li>
+      </ul>
+    </div>
+
+    <div class="drilldown__section" *ngIf="d.notaTecnicaResumo">
+      <h3>Nota técnica</h3>
+      <p>{{ d.notaTecnicaResumo }}</p>
+    </div>
+  </div>
+</div>
