@@ -41,23 +41,24 @@ public class DenunciaService {
     }
 
     @Transactional
-    public DenunciaResponse criarComDocumentos(DenunciaRequest request, org.springframework.web.multipart.MultipartFile[] arquivos) {
+    public DenunciaResponse criarComDocumentos(DenunciaRequest request, org.springframework.web.multipart.MultipartFile[] arquivos, String usuario) {
         var validados = documentoService.validar(arquivos);
-        var response = criar(request);
+        var response = criar(request, usuario);
         documentoService.salvar(response.getId(), validados);
         return buscar(response.getId());
     }
 
     @Transactional
-    public DenunciaResponse criar(DenunciaRequest request) {
+    public DenunciaResponse criar(DenunciaRequest request, String usuario) {
         Denuncia d = new Denuncia();
+        d.setCriadoPor(usuario);
         d.setComarca(request.getComarca());
         d.setNomeComunicante(request.getNomeComunicante());
         d.setMatriculaComunicante(request.getMatriculaComunicante());
         d.setOabAdvogado(request.getOabAdvogado());
         d.setCpfCnpjParte(request.getCpfCnpjParte());
         d.setTipologia(request.getTipologia());
-        d.setTipologiaOutros(request.getTipologiaOutros());
+        d.setTipologiaOutros(request.getTipologia() == br.jus.tjpb.lyno.litigancia.model.Tipologia.OUTROS ? request.getTipologiaOutros() : null);
         d.setProcessosParadigmas(request.getProcessosParadigmas());
         d.setRelato(request.getRelato());
         d.setAnexos(request.getAnexos() != null ? request.getAnexos() : List.of());
@@ -67,7 +68,7 @@ public class DenunciaService {
         d.setDataAtualizacao(d.getDataCriacao());
 
         Denuncia salvo = repository.save(d);
-        historicoRepository.save(new br.jus.tjpb.lyno.litigancia.model.Historico(salvo, null, "local", salvo.getDataCriacao()));
+        historicoRepository.save(new br.jus.tjpb.lyno.litigancia.model.Historico(salvo, null, usuario, salvo.getDataCriacao()));
         return DenunciaResponse.from(salvo);
     }
 
@@ -94,7 +95,7 @@ public class DenunciaService {
     }
 
     @Transactional
-    public DenunciaResponse atualizarStatus(Long id, StatusUpdateRequest request) {
+    public DenunciaResponse atualizarStatus(Long id, StatusUpdateRequest request, String usuario) {
         Denuncia d = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Denúncia não encontrada: " + id));
         if (!java.util.Objects.equals(d.getVersao(), request.versao)) {
@@ -121,8 +122,25 @@ public class DenunciaService {
         if (request.limparComarcas) d.setComarcasAtingidas(null);
         d.setDataAtualizacao(LocalDateTime.now(clock));
         repository.saveAndFlush(d);
-        historicoRepository.save(new br.jus.tjpb.lyno.litigancia.model.Historico(d, anterior, "local", d.getDataAtualizacao()));
+        historicoRepository.save(new br.jus.tjpb.lyno.litigancia.model.Historico(d, anterior, usuario, d.getDataAtualizacao()));
         return buscar(id);
+    }
+
+    @Transactional(readOnly = true)
+    public void verificarAcesso(Long id, org.springframework.security.core.Authentication auth) {
+        var denuncia = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Denúncia não encontrada"));
+        boolean analista = auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ANALISTA"));
+        if (!analista && (auth == null || !auth.getName().equals(denuncia.getCriadoPor()))) {
+            throw new EntityNotFoundException("Denúncia não encontrada");
+        }
+    }
+
+    @Transactional(readOnly = true)
+    public DenunciaResponse buscarPorProtocolo(String protocolo, org.springframework.security.core.Authentication auth) {
+        var denuncia = repository.findByNumeroProtocolo(protocolo.strip().toUpperCase(java.util.Locale.ROOT))
+                .orElseThrow(() -> new EntityNotFoundException("Denúncia não encontrada"));
+        verificarAcesso(denuncia.getId(), auth);
+        return buscar(denuncia.getId());
     }
 
     private String gerarNumeroProtocolo() {

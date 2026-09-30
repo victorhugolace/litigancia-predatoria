@@ -36,6 +36,10 @@ export class DenunciaService {
     return this.http.get<DenunciaResponse>(`${this.baseUrl}/${id}`);
   }
 
+  acompanhar(protocolo: string): Observable<DenunciaResponse> {
+    return this.http.get<DenunciaResponse>(`${this.baseUrl}/protocolo/${encodeURIComponent(protocolo)}`);
+  }
+
   atualizarStatus(id: number, payload: StatusUpdateRequest): Observable<DenunciaResponse> {
     return this.http.patch<DenunciaResponse>(`${this.baseUrl}/${id}/status`, payload);
   }

@@ -16,6 +16,8 @@ services:
     build:
       context: ./backend
       target: test
+    volumes:
+      - maven-test-cache:/root/.m2
     environment:
       DB_HOST: db
       DB_NAME: litigancia_test
@@ -25,3 +27,5 @@ services:
     depends_on:
       db:
         condition: service_healthy
+volumes:
+  maven-test-cache:

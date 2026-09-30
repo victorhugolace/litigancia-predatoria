@@ -6,6 +6,7 @@ import { DenunciaService } from '../../core/services/denuncia.service';
 import { Tipologia, TIPOLOGIA_LABELS } from '../../core/models/denuncia.model';
 import { textoObrigatorio, oabValida, documentoValido, processosDistintos } from '../../core/models/form.validators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { AuthService } from '../../core/services/auth.service';
 
 const CNJ_PATTERN = /^\d{7}-\d{2}\.\d{4}\.\d\.\d{2}\.\d{4}$/;
 
@@ -41,7 +42,7 @@ export class DenunciaFormComponent {
 
   form: FormGroup;
 
-  constructor(private fb: FormBuilder, private denunciaService: DenunciaService, private router: Router) {
+  constructor(private fb: FormBuilder, private denunciaService: DenunciaService, private router: Router, public auth: AuthService) {
     this.form = this.fb.group({
       comarca: ['', [textoObrigatorio, Validators.maxLength(120)]],
       nomeComunicante: ['', [textoObrigatorio, Validators.maxLength(150)]],
@@ -250,6 +251,10 @@ export class DenunciaFormComponent {
 
   irParaPainel(): void {
     this.router.navigate(['/painel']);
+  }
+
+  acompanharCaso(): void {
+    this.router.navigate(['/acompanhar'], { queryParams: { protocolo: this.protocoloGerado() } });
   }
 
   aplicarMascaraCNJ(index: number, event: Event): void {

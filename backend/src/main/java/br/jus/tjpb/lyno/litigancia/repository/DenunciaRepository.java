@@ -17,6 +17,7 @@ public interface DenunciaRepository extends JpaRepository<Denuncia, Long> {
 
     org.springframework.data.domain.Page<Denuncia> findAllByOrderByDataCriacaoDescIdDesc(org.springframework.data.domain.Pageable pageable);
     long countByStatus(StatusDenuncia status);
+    java.util.Optional<Denuncia> findByNumeroProtocolo(String numeroProtocolo);
 
     @Query("select count(d) from Denuncia d where d.dataCriacao >= :desde and d.dataCriacao < :ate")
     long countTotal(LocalDateTime desde, LocalDateTime ate);

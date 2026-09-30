@@ -48,7 +48,7 @@
             "development": { "buildTarget": "litigancia-predatoria-frontend:build:development" }
           },
           "defaultConfiguration": "development",
-          "options": { "port": 4200 }
+          "options": { "port": 4200, "proxyConfig": "proxy.conf.json" }
         }
       }
     }

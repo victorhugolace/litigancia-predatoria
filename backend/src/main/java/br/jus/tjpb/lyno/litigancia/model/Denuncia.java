@@ -16,6 +16,8 @@ public class Denuncia {
     @Version
     @Column(nullable = false)
     private Long versao;
+    @Column(name = "criado_por", length = 120)
+    private String criadoPor;
 
     @Column(name = "numero_protocolo", nullable = false, unique = true, length = 30)
     private String numeroProtocolo;
@@ -89,6 +91,8 @@ public class Denuncia {
 
     public Long getId() { return id; }
     public Long getVersao() { return versao; }
+    public String getCriadoPor() { return criadoPor; }
+    public void setCriadoPor(String criadoPor) { this.criadoPor = criadoPor; }
     public void setId(Long id) { this.id = id; }
 
     public String getNumeroProtocolo() { return numeroProtocolo; }

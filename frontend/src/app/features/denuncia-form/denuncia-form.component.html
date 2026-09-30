@@ -35,7 +35,7 @@
     <!-- Passo 1: Identificação da origem -->
     <section class="form-step" *ngIf="currentStep() === 0">
       <h2>Identificação da origem</h2>
-      <p class="form-step__hint">Se estiver logado na intranet, esses dados normalmente já vêm preenchidos.</p>
+      <p class="form-step__hint">Informe a origem do alerta. A conta {{ auth.sessao().usuario }} ficará vinculada ao registro.</p>
 
       <div class="field">
         <label for="comarca">Comarca / Unidade Judiciária</label>
@@ -214,7 +214,8 @@
     <div class="confirmation__protocolo">{{ protocoloGerado() }}</div>
     <div class="confirmation__actions">
       <button class="lp-btn lp-btn--ghost" (click)="registrarNova()">Registrar outra denúncia</button>
-      <button class="lp-btn lp-btn--primary" (click)="irParaPainel()">Ver painel de controle</button>
+      <button class="lp-btn lp-btn--primary" (click)="acompanharCaso()">Acompanhar este caso</button>
+      <button class="lp-btn lp-btn--ghost" *ngIf="auth.analista" (click)="irParaPainel()">Ver painel de controle</button>
     </div>
   </div>
 </ng-template>

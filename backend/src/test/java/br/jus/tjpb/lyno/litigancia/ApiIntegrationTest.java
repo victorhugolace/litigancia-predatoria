@@ -14,10 +14,12 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@org.springframework.security.test.context.support.WithMockUser(username = "analista", roles = "ANALISTA")
 class ApiIntegrationTest {
     @Autowired MockMvc mvc;
     @Autowired DenunciaRepository repository;
@@ -45,14 +47,14 @@ class ApiIntegrationTest {
                 .andExpect(jsonPath("$.totalDenuncias").value(0));
         mvc.perform(get("/api/dashboard/tendencia"))
                 .andExpect(status().isOk());
-        mvc.perform(post("/api/denuncias").contentType("application/json").content("{}"))
+        mvc.perform(post("/api/denuncias").with(csrf()).contentType("application/json").content("{}"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.erros.oabAdvogado").exists());
     }
 
     @Test
     void cadastraNormalizaEBuscaColecoesForaDaTransacao() throws Exception {
-        String body = mvc.perform(post("/api/denuncias").contentType("application/json").content(dadosValidos()))
+        String body = mvc.perform(post("/api/denuncias").with(csrf()).contentType("application/json").content(dadosValidos()))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.comarca").value("João Pessoa"))
                 .andExpect(jsonPath("$.oabAdvogado").value("PB12345"))
@@ -61,7 +63,7 @@ class ApiIntegrationTest {
         long id = mapper.readTree(body).get("id").asLong();
         mvc.perform(get("/api/denuncias/" + id))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.processosParadigmas.length()").value(3));
-        mvc.perform(patch("/api/denuncias/" + id + "/status").contentType("application/json")
+        mvc.perform(patch("/api/denuncias/" + id + "/status").with(csrf()).contentType("application/json")
                 .content("{\"volumeProcessualEstimado\":-1}"))
                 .andExpect(status().isBadRequest());
     }
@@ -75,7 +77,7 @@ class ApiIntegrationTest {
                 dadosValidos().replace("FATIAMENTO_PEDIDOS", "OUTROS"),
                 dadosValidos().replace("João Pessoa", "X".repeat(121))
         }) {
-            mvc.perform(post("/api/denuncias").contentType("application/json").content(invalid))
+            mvc.perform(post("/api/denuncias").with(csrf()).contentType("application/json").content(invalid))
                     .andExpect(status().isBadRequest());
         }
         assertThat(repository.count()).isZero();
@@ -86,7 +88,7 @@ class ApiIntegrationTest {
         DenunciaRequest request = mapper.readValue(dadosValidos(), DenunciaRequest.class);
         try (var executor = Executors.newFixedThreadPool(6)) {
             var futures = IntStream.range(0, 24).mapToObj(i ->
-                    executor.submit(() -> service.criar(request).getNumeroProtocolo())).toList();
+                    executor.submit(() -> service.criar(request, "analista").getNumeroProtocolo())).toList();
             var protocols = new java.util.HashSet<String>();
             for (var future : futures) protocols.add(future.get(30, TimeUnit.SECONDS));
             assertThat(protocols).hasSize(24);
@@ -101,8 +103,8 @@ class ApiIntegrationTest {
     @Test
     void filtraPeriodoECompletaSemanasSemAlertas() throws Exception {
         var request = mapper.readValue(dadosValidos(), DenunciaRequest.class);
-        var atual = service.criar(request);
-        var antigo = service.criar(request);
+        var atual = service.criar(request, "analista");
+        var antigo = service.criar(request, "analista");
         jdbc.update("update denuncias set data_criacao = ? where id = ?",
                 java.time.LocalDate.now().minusYears(2).atStartOfDay(), antigo.getId());
         mvc.perform(get("/api/dashboard/kpis").param("periodo", "ANO"))
@@ -122,15 +124,15 @@ class ApiIntegrationTest {
 
     @Test
     void atualizaEtapaAuditaERejeitaVersaoDesatualizada() throws Exception {
-        var d = service.criar(mapper.readValue(dadosValidos(), DenunciaRequest.class));
+        var d = service.criar(mapper.readValue(dadosValidos(), DenunciaRequest.class), "analista");
         String payload = "{\"versao\":0,\"status\":\"EM_ANALISE_NUMOPED\",\"volumeProcessualEstimado\":100,\"comarcasAtingidas\":2,\"notaTecnicaResumo\":\"Em análise\"}";
-        mvc.perform(patch("/api/denuncias/" + d.getId() + "/status").contentType("application/json").content(payload))
+        mvc.perform(patch("/api/denuncias/" + d.getId() + "/status").with(csrf()).contentType("application/json").content(payload))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.versao").value(1))
                 .andExpect(jsonPath("$.status").value("EM_ANALISE_NUMOPED"))
                 .andExpect(jsonPath("$.historico.length()").value(2));
-        mvc.perform(patch("/api/denuncias/" + d.getId() + "/status").contentType("application/json").content(payload))
+        mvc.perform(patch("/api/denuncias/" + d.getId() + "/status").with(csrf()).contentType("application/json").content(payload))
                 .andExpect(status().isConflict());
-        mvc.perform(patch("/api/denuncias/" + d.getId() + "/status").contentType("application/json")
+        mvc.perform(patch("/api/denuncias/" + d.getId() + "/status").with(csrf()).contentType("application/json")
                         .content("{\"versao\":1,\"limparVolume\":true,\"limparComarcas\":true,\"notaTecnicaResumo\":\"\"}"))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.volumeProcessualEstimado").isEmpty())
                 .andExpect(jsonPath("$.historico.length()").value(3));
@@ -143,7 +145,7 @@ class ApiIntegrationTest {
         byte[] pdf = "%PDF-1.4\nDocumento de teste\n%%EOF".getBytes(java.nio.charset.StandardCharsets.UTF_8);
         var dados = new org.springframework.mock.web.MockMultipartFile("dados", "", "application/json", dadosValidos().getBytes(java.nio.charset.StandardCharsets.UTF_8));
         var arquivo = new org.springframework.mock.web.MockMultipartFile("arquivos", "../../laudo.pdf", "application/pdf", pdf);
-        var response = mvc.perform(multipart("/api/denuncias").file(dados).file(arquivo))
+        var response = mvc.perform(multipart("/api/denuncias").file(dados).file(arquivo).with(csrf()))
                 .andExpect(status().isCreated()).andExpect(jsonPath("$.documentos[0].nome").value("laudo.pdf"))
                 .andReturn().getResponse().getContentAsString();
         var tree = mapper.readTree(response);
@@ -160,11 +162,57 @@ class ApiIntegrationTest {
     void rejeitaAnexosInvalidosSemCriarDenunciaParcial() throws Exception {
         var dados = new org.springframework.mock.web.MockMultipartFile("dados", "", "application/json", dadosValidos().getBytes(java.nio.charset.StandardCharsets.UTF_8));
         var falso = new org.springframework.mock.web.MockMultipartFile("arquivos", "falso.pdf", "application/pdf", "nao e PDF".getBytes());
-        mvc.perform(multipart("/api/denuncias").file(dados).file(falso)).andExpect(status().isBadRequest());
+        mvc.perform(multipart("/api/denuncias").file(dados).file(falso).with(csrf())).andExpect(status().isBadRequest());
         var grande = new org.springframework.mock.web.MockMultipartFile("arquivos", "grande.pdf", "application/pdf", new byte[10 * 1024 * 1024 + 1]);
-        mvc.perform(multipart("/api/denuncias").file(dados).file(grande)).andExpect(status().isBadRequest());
-        mvc.perform(post("/api/denuncias").contentType("application/json").content(dadosValidos().replace("\"anexos\":[]", "\"anexos\":[\"perdido.pdf\"]")))
+        mvc.perform(multipart("/api/denuncias").file(dados).file(grande).with(csrf())).andExpect(status().isBadRequest());
+        mvc.perform(post("/api/denuncias").with(csrf()).contentType("application/json").content(dadosValidos().replace("\"anexos\":[]", "\"anexos\":[\"perdido.pdf\"]")))
                 .andExpect(status().isBadRequest());
         assertThat(repository.count()).isZero();
+    }
+
+    @Test
+    @org.springframework.security.test.context.support.WithAnonymousUser
+    void exigeLoginECsrf() throws Exception {
+        mvc.perform(get("/api/denuncias")).andExpect(status().isUnauthorized());
+        mvc.perform(get("/api/dashboard/kpis")).andExpect(status().isUnauthorized());
+        mvc.perform(post("/api/denuncias").with(user("analista").roles("ANALISTA"))
+                .contentType("application/json").content(dadosValidos())).andExpect(status().isForbidden());
+    }
+
+    @Test
+    void restringeComunicanteAosPropriosCasosEAuditaAutor() throws Exception {
+        var propria = service.criar(mapper.readValue(dadosValidos(), DenunciaRequest.class), "comunicante");
+        var alheia = service.criar(mapper.readValue(dadosValidos(), DenunciaRequest.class), "outro");
+        mvc.perform(get("/api/denuncias/" + propria.getId()).with(user("comunicante").roles("COMUNICANTE")))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.historico[0].autor").value("comunicante"));
+        mvc.perform(get("/api/denuncias/protocolo/" + propria.getNumeroProtocolo()).with(user("comunicante").roles("COMUNICANTE")))
+                .andExpect(status().isOk());
+        mvc.perform(get("/api/denuncias/" + alheia.getId()).with(user("comunicante").roles("COMUNICANTE")))
+                .andExpect(status().isNotFound());
+        mvc.perform(get("/api/dashboard/kpis").with(user("comunicante").roles("COMUNICANTE"))).andExpect(status().isForbidden());
+        mvc.perform(get("/api/denuncias").with(user("comunicante").roles("COMUNICANTE"))).andExpect(status().isForbidden());
+        mvc.perform(patch("/api/denuncias/" + propria.getId() + "/status").with(user("comunicante").roles("COMUNICANTE"))
+                        .with(csrf()).contentType("application/json").content("{\"versao\":0,\"status\":\"ARQUIVADO\"}"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @org.springframework.security.test.context.support.WithAnonymousUser
+    void autenticaComSessaoRenovaCsrfEEncerraAcesso() throws Exception {
+        var inicial = mvc.perform(get("/api/session")).andExpect(status().isOk()).andReturn();
+        var session = (org.springframework.mock.web.MockHttpSession) inicial.getRequest().getSession(false);
+        String csrfToken = mapper.readTree(inicial.getResponse().getContentAsString()).get("csrfToken").asText();
+        // A partir daqui, exercita o contexto real salvo na sessão pelo login.
+        org.springframework.security.test.context.TestSecurityContextHolder.clearContext();
+        mvc.perform(post("/api/login").session(session).header("X-CSRF-TOKEN", csrfToken)
+                        .param("username", "analista").param("password", "senha-teste-analista"))
+                .andExpect(status().isNoContent());
+        var autenticada = mvc.perform(get("/api/session").session(session)).andExpect(jsonPath("$.autenticado").value(true)).andReturn();
+        String novoCsrf = mapper.readTree(autenticada.getResponse().getContentAsString()).get("csrfToken").asText();
+        mvc.perform(post("/api/denuncias").session(session).header("X-CSRF-TOKEN", novoCsrf)
+                        .contentType("application/json").content(dadosValidos()))
+                .andExpect(status().isCreated());
+        mvc.perform(post("/api/logout").session(session).header("X-CSRF-TOKEN", novoCsrf)).andExpect(status().isNoContent());
+        mvc.perform(get("/api/denuncias")).andExpect(status().isUnauthorized());
     }
 }

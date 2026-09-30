@@ -1,14 +1,14 @@
 FROM maven:3.9-eclipse-temurin-21 AS source
 WORKDIR /app
 COPY pom.xml .
-RUN mvn -B dependency:go-offline
+RUN --mount=type=cache,target=/root/.m2 mvn -B -ntp dependency:go-offline
 COPY src ./src
 
 FROM source AS test
-CMD ["mvn", "-B", "verify"]
+CMD ["mvn", "-B", "-ntp", "verify"]
 
 FROM source AS build
-RUN mvn -B clean package -DskipTests
+RUN --mount=type=cache,target=/root/.m2 mvn -B -ntp clean package -DskipTests
 
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app

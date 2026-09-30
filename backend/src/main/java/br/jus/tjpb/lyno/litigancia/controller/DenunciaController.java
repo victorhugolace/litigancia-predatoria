@@ -25,19 +25,21 @@ public class DenunciaController {
     }
 
     @PostMapping(consumes = "application/json")
-    public ResponseEntity<DenunciaResponse> criar(@Valid @RequestBody DenunciaRequest request) {
-        DenunciaResponse response = service.criar(request);
+    public ResponseEntity<DenunciaResponse> criar(@Valid @RequestBody DenunciaRequest request, org.springframework.security.core.Authentication auth) {
+        DenunciaResponse response = service.criar(request, auth.getName());
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PostMapping(consumes = "multipart/form-data")
     public ResponseEntity<DenunciaResponse> criarComDocumentos(@Valid @RequestPart("dados") DenunciaRequest request,
-            @RequestPart(value = "arquivos", required = false) org.springframework.web.multipart.MultipartFile[] arquivos) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(service.criarComDocumentos(request, arquivos));
+            @RequestPart(value = "arquivos", required = false) org.springframework.web.multipart.MultipartFile[] arquivos,
+            org.springframework.security.core.Authentication auth) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.criarComDocumentos(request, arquivos, auth.getName()));
     }
 
     @GetMapping("/{id}/documentos/{documentoId}")
-    public ResponseEntity<byte[]> baixarDocumento(@PathVariable Long id, @PathVariable java.util.UUID documentoId) {
+    public ResponseEntity<byte[]> baixarDocumento(@PathVariable Long id, @PathVariable java.util.UUID documentoId, org.springframework.security.core.Authentication auth) {
+        service.verificarAcesso(id, auth);
         var documento = documentoService.buscar(id, documentoId);
         return ResponseEntity.ok().contentType(org.springframework.http.MediaType.APPLICATION_PDF)
                 .header("Content-Disposition", org.springframework.http.ContentDisposition.attachment().filename(documento.getNome(), java.nio.charset.StandardCharsets.UTF_8).build().toString())
@@ -52,12 +54,18 @@ public class DenunciaController {
     }
 
     @GetMapping("/{id}")
-    public DenunciaResponse buscar(@PathVariable Long id) {
+    public DenunciaResponse buscar(@PathVariable Long id, org.springframework.security.core.Authentication auth) {
+        service.verificarAcesso(id, auth);
         return service.buscar(id);
     }
 
+    @GetMapping("/protocolo/{protocolo}")
+    public DenunciaResponse acompanhar(@PathVariable String protocolo, org.springframework.security.core.Authentication auth) {
+        return service.buscarPorProtocolo(protocolo, auth);
+    }
+
     @PatchMapping("/{id}/status")
-    public DenunciaResponse atualizarStatus(@PathVariable Long id, @Valid @RequestBody StatusUpdateRequest request) {
-        return service.atualizarStatus(id, request);
+    public DenunciaResponse atualizarStatus(@PathVariable Long id, @Valid @RequestBody StatusUpdateRequest request, org.springframework.security.core.Authentication auth) {
+        return service.atualizarStatus(id, request, auth.getName());
     }
 }

@@ -1,3 +1,7 @@
+app:
+  auth:
+    reporter-password: ${APP_REPORTER_PASSWORD:oficina-comunicante}
+    analyst-password: ${APP_ANALYST_PASSWORD:oficina-analista}
 spring:
   sql:
     init:
