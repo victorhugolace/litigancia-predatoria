@@ -64,8 +64,11 @@ public class DashboardDtos {
 
     public static class StatusUpdateRequest {
         public br.jus.tjpb.lyno.litigancia.model.StatusDenuncia status;
+        @jakarta.validation.constraints.Min(0)
         public Integer volumeProcessualEstimado;
+        @jakarta.validation.constraints.Min(1)
         public Integer comarcasAtingidas;
+        @jakarta.validation.constraints.Size(max = 800)
         public String notaTecnicaResumo;
     }
 }

@@ -39,7 +39,7 @@ public class DenunciaController {
     }
 
     @PatchMapping("/{id}/status")
-    public DenunciaResponse atualizarStatus(@PathVariable Long id, @RequestBody StatusUpdateRequest request) {
+    public DenunciaResponse atualizarStatus(@PathVariable Long id, @Valid @RequestBody StatusUpdateRequest request) {
         return service.atualizarStatus(id, request);
     }
 }

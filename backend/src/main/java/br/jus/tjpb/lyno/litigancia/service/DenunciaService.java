@@ -11,8 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.Clock;
 import java.time.Year;
-import java.time.ZoneOffset;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,9 +20,11 @@ import java.util.stream.Collectors;
 public class DenunciaService {
 
     private final DenunciaRepository repository;
+    private final Clock clock;
 
-    public DenunciaService(DenunciaRepository repository) {
+    public DenunciaService(DenunciaRepository repository, Clock clock) {
         this.repository = repository;
+        this.clock = clock;
     }
 
     @Transactional
@@ -80,8 +82,8 @@ public class DenunciaService {
     }
 
     private String gerarNumeroProtocolo() {
-        long sequencial = repository.count() + 1;
-        return "LP-" + Year.now().getValue() + "-" + String.format("%06d", sequencial);
+        long sequencial = repository.proximoProtocolo();
+        return "LP-" + Year.now(clock).getValue() + "-" + String.format("%06d", sequencial);
     }
 
     // --- Dashboard ---

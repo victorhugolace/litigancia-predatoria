@@ -4,6 +4,8 @@ import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } fr
 import { Router } from '@angular/router';
 import { DenunciaService } from '../../core/services/denuncia.service';
 import { Tipologia, TIPOLOGIA_LABELS } from '../../core/models/denuncia.model';
+import { textoObrigatorio, oabValida, documentoValido, processosDistintos } from '../../core/models/form.validators';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 const CNJ_PATTERN = /^\d{7}-\d{2}\.\d{4}\.\d\.\d{2}\.\d{4}$/;
 
@@ -41,18 +43,25 @@ export class DenunciaFormComponent {
 
   constructor(private fb: FormBuilder, private denunciaService: DenunciaService, private router: Router) {
     this.form = this.fb.group({
-      comarca: ['', Validators.required],
-      nomeComunicante: ['', Validators.required],
-      matriculaComunicante: ['', Validators.required],
-      oabAdvogado: ['', Validators.required],
-      cpfCnpjParte: [''],
+      comarca: ['', [textoObrigatorio, Validators.maxLength(120)]],
+      nomeComunicante: ['', [textoObrigatorio, Validators.maxLength(150)]],
+      matriculaComunicante: ['', [textoObrigatorio, Validators.maxLength(30)]],
+      oabAdvogado: ['', [textoObrigatorio, oabValida]],
+      cpfCnpjParte: ['', documentoValido],
       tipologia: [null as Tipologia | null, Validators.required],
-      tipologiaOutros: [''],
+      tipologiaOutros: ['', Validators.maxLength(120)],
       processosParadigmas: this.fb.array(
         [this.novoProcesso(), this.novoProcesso(), this.novoProcesso()],
-        [Validators.minLength(3), Validators.maxLength(5)]
+        [Validators.minLength(3), Validators.maxLength(5), processosDistintos]
       ),
-      relato: ['', [Validators.required, Validators.maxLength(500)]]
+      relato: ['', [textoObrigatorio, Validators.maxLength(500)]]
+    });
+    this.form.get('tipologia')!.valueChanges.pipe(takeUntilDestroyed()).subscribe(value => {
+      const outros = this.form.get('tipologiaOutros')!;
+      outros.setValidators(value === Tipologia.OUTROS
+        ? [textoObrigatorio, Validators.maxLength(120)] : [Validators.maxLength(120)]);
+      if (value !== Tipologia.OUTROS) outros.setValue('', { emitEvent: false });
+      outros.updateValueAndValidity();
     });
   }
 
@@ -182,8 +191,11 @@ export class DenunciaFormComponent {
   }
 
   enviar(): void {
+    if (this.enviando()) return;
     if (this.form.invalid) {
       this.form.markAllAsTouched();
+      const invalidStep = this.steps.findIndex((_, index) => !this.passoValido(index));
+      if (invalidStep >= 0) this.currentStep.set(invalidStep);
       return;
     }
     this.enviando.set(true);
@@ -209,6 +221,7 @@ export class DenunciaFormComponent {
       error: erro => {
         this.enviando.set(false);
         this.erroEnvio.set(
+          erro?.error?.erros ? Object.values(erro.error.erros).join('; ') :
           erro?.error?.mensagem ?? 'Não foi possível registrar a denúncia. Tente novamente em instantes.'
         );
       }

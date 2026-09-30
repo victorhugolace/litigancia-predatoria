@@ -10,6 +10,9 @@ import java.util.List;
 
 public interface DenunciaRepository extends JpaRepository<Denuncia, Long> {
 
+    @Query(value = "select nextval('denuncia_protocolo_seq')", nativeQuery = true)
+    long proximoProtocolo();
+
     List<Denuncia> findByStatusOrderByDataCriacaoDesc(StatusDenuncia status);
 
     List<Denuncia> findAllByOrderByDataCriacaoDesc();
