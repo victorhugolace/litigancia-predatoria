@@ -111,14 +111,23 @@
     <!-- Visão Operacional (Kanban) -->
     <section class="panel-header-standalone">
       <h2>Fila de trabalho</h2>
-      <span class="panel__hint">Clique em uma denúncia para ver os detalhes informados no formulário</span>
+      <span class="panel__hint">Todo o histórico · {{ totalFila }} casos · clique para consultar ou atualizar a análise</span>
     </section>
+    <div class="dash__filtros">
+      <label for="statusFila">Etapa da fila</label>
+      <select id="statusFila" [(ngModel)]="filtroStatus" (ngModelChange)="filtrarFila()">
+        <option value="">Todas</option><option *ngFor="let etapa of statusOrder" [value]="etapa">{{ statusLabels[etapa] }}</option>
+      </select>
+      <button class="lp-btn lp-btn--ghost" (click)="mudarPagina(-1)" [disabled]="pagina === 0">Página anterior</button>
+      <span>Página {{ pagina + 1 }} de {{ totalPaginas || 1 }}</span>
+      <button class="lp-btn lp-btn--ghost" (click)="mudarPagina(1)" [disabled]="pagina + 1 >= totalPaginas">Próxima página</button>
+    </div>
 
     <div class="kanban">
       <div class="kanban__column" *ngFor="let status of statusOrder">
         <div class="kanban__column-header">
           <span>{{ statusLabels[status] }}</span>
-          <span class="kanban__count">{{ denunciasPorStatus(status).length }}</span>
+          <span class="kanban__count">{{ totaisPorStatus[status] ?? 0 }}</span>
         </div>
         <div class="kanban__cards">
           <button class="kanban__card" *ngFor="let d of denunciasPorStatus(status)" (click)="abrirDrillDown(d)">
@@ -127,7 +136,7 @@
             <span class="kanban__card-tipologia">{{ d.tipologiaDescricao }}</span>
             <span class="kanban__card-comarca">{{ d.comarca }}</span>
           </button>
-          <p class="kanban__empty" *ngIf="denunciasPorStatus(status).length === 0">Sem denúncias nesta etapa.</p>
+          <p class="kanban__empty" *ngIf="denunciasPorStatus(status).length === 0">Nenhum caso nesta página.</p>
         </div>
       </div>
     </div>
@@ -136,13 +145,13 @@
 
 <!-- Drill-down modal -->
 <div class="drilldown-overlay" *ngIf="denunciaSelecionada() as d" (click)="fecharDrillDown()">
-  <div class="drilldown lp-card" (click)="$event.stopPropagation()">
+  <div class="drilldown lp-card" role="dialog" aria-modal="true" aria-labelledby="tituloCaso" (keydown)="tecladoModal($event)" (click)="$event.stopPropagation()">
     <header class="drilldown__header">
       <div>
         <span class="drilldown__protocolo">{{ d.numeroProtocolo }}</span>
-        <h2>{{ d.tipologiaDescricao }}</h2>
+        <h2 id="tituloCaso">{{ d.tipologiaDescricao }}</h2>
       </div>
-      <button class="drilldown__close" (click)="fecharDrillDown()" aria-label="Fechar">✕</button>
+      <button class="drilldown__close" (click)="fecharDrillDown()" [disabled]="salvando()" aria-label="Fechar">✕</button>
     </header>
 
     <div class="drilldown__meta">
@@ -170,5 +179,29 @@
       <h3>Nota técnica</h3>
       <p>{{ d.notaTecnicaResumo }}</p>
     </div>
+    <p *ngIf="carregandoDetalhe()">Carregando detalhes…</p>
+    <div *ngIf="erroDetalhe()" class="dash__erro" role="alert">
+      <p>{{ erroDetalhe() }}</p><button class="lp-btn lp-btn--ghost" (click)="recarregarDetalhe()">Recarregar caso</button>
+    </div>
+    <p *ngIf="sucessoEdicao()" role="status">Análise atualizada.</p>
+    <form [formGroup]="edicao" (ngSubmit)="salvarEdicao()" *ngIf="!carregandoDetalhe() && !erroDetalhe()" class="edicao-caso">
+      <h3>Atualizar análise</h3>
+      <label for="etapaCaso">Etapa</label>
+      <select id="etapaCaso" formControlName="status"><option *ngFor="let etapa of statusOrder" [value]="etapa">{{ statusLabels[etapa] }}</option></select>
+      <label for="volumeCaso">Volume processual estimado</label><input id="volumeCaso" type="number" min="0" step="1" formControlName="volume">
+      <label for="comarcasCaso">Número de comarcas atingidas</label><input id="comarcasCaso" type="number" min="1" step="1" formControlName="comarcas">
+      <label for="notaCaso">Resumo da nota técnica</label><textarea id="notaCaso" rows="4" maxlength="800" formControlName="nota"></textarea>
+      <p class="field__error" *ngIf="edicao.invalid && edicao.touched">Informe estimativas inteiras válidas e uma nota de até 800 caracteres.</p>
+      <button class="lp-btn lp-btn--primary" type="submit" [disabled]="salvando()">{{ salvando() ? 'Salvando…' : 'Salvar análise' }}</button>
+    </form>
+    <section class="drilldown__section" *ngIf="d.historico.length">
+      <h3>Histórico de acompanhamento</h3>
+      <ol class="historico"><li *ngFor="let registro of d.historico">
+        <strong>{{ registro.statusAnterior ? statusLabels[registro.statusAnterior] + ' → ' : 'Registro → ' }}{{ statusLabels[registro.statusNovo] }}</strong>
+        <p>{{ registro.autor }} · {{ formatarData(registro.data) }}</p>
+        <p *ngIf="registro.volume != null">Volume: {{ registro.volume }} · Comarcas: {{ registro.comarcas ?? 'não informadas' }}</p>
+        <p *ngIf="registro.nota">{{ registro.nota }}</p>
+      </li></ol>
+    </section>
   </div>
 </div>

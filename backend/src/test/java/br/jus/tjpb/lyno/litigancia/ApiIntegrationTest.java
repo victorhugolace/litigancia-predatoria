@@ -91,6 +91,10 @@ class ApiIntegrationTest {
             for (var future : futures) protocols.add(future.get(30, TimeUnit.SECONDS));
             assertThat(protocols).hasSize(24);
             assertThat(repository.count()).isEqualTo(24);
+            mvc.perform(get("/api/denuncias").param("tamanho", "5").param("pagina", "1"))
+                    .andExpect(jsonPath("$.itens.length()").value(5))
+                    .andExpect(jsonPath("$.total").value(24))
+                    .andExpect(jsonPath("$.totalPaginas").value(5));
         }
     }
 
@@ -114,5 +118,23 @@ class ApiIntegrationTest {
                 .andExpect(jsonPath("$[0].totalDenuncias").value(1));
         mvc.perform(get("/api/dashboard/kpis").param("periodo", "INVALIDO"))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void atualizaEtapaAuditaERejeitaVersaoDesatualizada() throws Exception {
+        var d = service.criar(mapper.readValue(dadosValidos(), DenunciaRequest.class));
+        String payload = "{\"versao\":0,\"status\":\"EM_ANALISE_NUMOPED\",\"volumeProcessualEstimado\":100,\"comarcasAtingidas\":2,\"notaTecnicaResumo\":\"Em análise\"}";
+        mvc.perform(patch("/api/denuncias/" + d.getId() + "/status").contentType("application/json").content(payload))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.versao").value(1))
+                .andExpect(jsonPath("$.status").value("EM_ANALISE_NUMOPED"))
+                .andExpect(jsonPath("$.historico.length()").value(2));
+        mvc.perform(patch("/api/denuncias/" + d.getId() + "/status").contentType("application/json").content(payload))
+                .andExpect(status().isConflict());
+        mvc.perform(patch("/api/denuncias/" + d.getId() + "/status").contentType("application/json")
+                        .content("{\"versao\":1,\"limparVolume\":true,\"limparComarcas\":true,\"notaTecnicaResumo\":\"\"}"))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.volumeProcessualEstimado").isEmpty())
+                .andExpect(jsonPath("$.historico.length()").value(3));
+        mvc.perform(get("/api/denuncias").param("tamanho", "101")).andExpect(status().isBadRequest());
+        mvc.perform(get("/api/denuncias").param("pagina", "-1")).andExpect(status().isBadRequest());
     }
 }

@@ -13,9 +13,10 @@ public interface DenunciaRepository extends JpaRepository<Denuncia, Long> {
     @Query(value = "select nextval('denuncia_protocolo_seq')", nativeQuery = true)
     long proximoProtocolo();
 
-    List<Denuncia> findByStatusOrderByDataCriacaoDesc(StatusDenuncia status);
+    org.springframework.data.domain.Page<Denuncia> findByStatusOrderByDataCriacaoDescIdDesc(StatusDenuncia status, org.springframework.data.domain.Pageable pageable);
 
-    List<Denuncia> findAllByOrderByDataCriacaoDesc();
+    org.springframework.data.domain.Page<Denuncia> findAllByOrderByDataCriacaoDescIdDesc(org.springframework.data.domain.Pageable pageable);
+    long countByStatus(StatusDenuncia status);
 
     @Query("select count(d) from Denuncia d where d.dataCriacao >= :desde and d.dataCriacao < :ate")
     long countTotal(LocalDateTime desde, LocalDateTime ate);

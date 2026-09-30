@@ -13,6 +13,10 @@ public class Denuncia {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Version
+    @Column(nullable = false)
+    private Long versao;
+
     @Column(name = "numero_protocolo", nullable = false, unique = true, length = 30)
     private String numeroProtocolo;
 
@@ -84,6 +88,7 @@ public class Denuncia {
     // --- Getters e setters ---
 
     public Long getId() { return id; }
+    public Long getVersao() { return versao; }
     public void setId(Long id) { this.id = id; }
 
     public String getNumeroProtocolo() { return numeroProtocolo; }

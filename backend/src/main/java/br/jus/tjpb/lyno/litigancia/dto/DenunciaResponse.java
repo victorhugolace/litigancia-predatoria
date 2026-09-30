@@ -9,6 +9,8 @@ import java.util.List;
 
 public class DenunciaResponse {
     private Long id;
+    private Long versao;
+    private List<br.jus.tjpb.lyno.litigancia.model.Historico> historico = List.of();
     private String numeroProtocolo;
     private String comarca;
     private String nomeComunicante;
@@ -32,6 +34,7 @@ public class DenunciaResponse {
     public static DenunciaResponse from(Denuncia d) {
         DenunciaResponse r = new DenunciaResponse();
         r.id = d.getId();
+        r.versao = d.getVersao();
         r.numeroProtocolo = d.getNumeroProtocolo();
         r.comarca = d.getComarca();
         r.nomeComunicante = d.getNomeComunicante();
@@ -57,6 +60,9 @@ public class DenunciaResponse {
     // Getters (no setters needed for a read-only projection, but Jackson needs getters)
 
     public Long getId() { return id; }
+    public Long getVersao() { return versao; }
+    public List<br.jus.tjpb.lyno.litigancia.model.Historico> getHistorico() { return historico; }
+    public void setHistorico(List<br.jus.tjpb.lyno.litigancia.model.Historico> historico) { this.historico = historico; }
     public String getNumeroProtocolo() { return numeroProtocolo; }
     public String getComarca() { return comarca; }
     public String getNomeComunicante() { return nomeComunicante; }

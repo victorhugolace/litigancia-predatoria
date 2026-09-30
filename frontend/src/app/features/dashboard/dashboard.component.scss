@@ -3,6 +3,10 @@
 .dash__filtros select { padding: 8px; border: 1px solid var(--lp-line); border-radius: 4px; }
 .dash__erro { padding: 24px; background: var(--lp-alert-100); color: var(--lp-alert-700); }
 .dash__erro p { margin-bottom: 12px; }
+.edicao-caso { display: flex; flex-direction: column; gap: 8px; margin: 20px 0; }
+.edicao-caso input, .edicao-caso select, .edicao-caso textarea { padding: 8px; border: 1px solid var(--lp-line); border-radius: 4px; font: inherit; }
+.historico { padding-left: 20px; }
+.historico li { margin-bottom: 14px; }
 
 .dash__eyebrow {
   display: inline-block;

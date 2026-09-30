@@ -63,7 +63,12 @@ public class DashboardDtos {
     }
 
     public static class StatusUpdateRequest {
+        @jakarta.validation.constraints.NotNull
+        @jakarta.validation.constraints.Min(0)
+        public Long versao;
         public br.jus.tjpb.lyno.litigancia.model.StatusDenuncia status;
+        public boolean limparVolume;
+        public boolean limparComarcas;
         @jakarta.validation.constraints.Min(0)
         public Integer volumeProcessualEstimado;
         @jakarta.validation.constraints.Min(1)

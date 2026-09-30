@@ -26,10 +26,13 @@ public class DenunciaService {
 
     private final DenunciaRepository repository;
     private final Clock clock;
+    private final br.jus.tjpb.lyno.litigancia.repository.HistoricoRepository historicoRepository;
 
-    public DenunciaService(DenunciaRepository repository, Clock clock) {
+    public DenunciaService(DenunciaRepository repository, Clock clock,
+                          br.jus.tjpb.lyno.litigancia.repository.HistoricoRepository historicoRepository) {
         this.repository = repository;
         this.clock = clock;
+        this.historicoRepository = historicoRepository;
     }
 
     @Transactional
@@ -51,28 +54,43 @@ public class DenunciaService {
         d.setDataAtualizacao(d.getDataCriacao());
 
         Denuncia salvo = repository.save(d);
+        historicoRepository.save(new br.jus.tjpb.lyno.litigancia.model.Historico(salvo, null, "local", salvo.getDataCriacao()));
         return DenunciaResponse.from(salvo);
     }
 
     @Transactional(readOnly = true)
-    public List<DenunciaResponse> listar(StatusDenuncia status) {
-        List<Denuncia> denuncias = (status != null)
-                ? repository.findByStatusOrderByDataCriacaoDesc(status)
-                : repository.findAllByOrderByDataCriacaoDesc();
-        return denuncias.stream().map(DenunciaResponse::from).collect(Collectors.toList());
+    public br.jus.tjpb.lyno.litigancia.dto.PaginaDenuncias listar(StatusDenuncia status, int pagina, int tamanho) {
+        if (pagina < 0 || tamanho < 1 || tamanho > 100) throw new IllegalArgumentException("Página inválida ou tamanho fora de 1 a 100");
+        var page = PageRequest.of(pagina, tamanho);
+        var denuncias = status != null ? repository.findByStatusOrderByDataCriacaoDescIdDesc(status, page)
+                : repository.findAllByOrderByDataCriacaoDescIdDesc(page);
+        var totais = new java.util.EnumMap<StatusDenuncia, Long>(StatusDenuncia.class);
+        for (var etapa : StatusDenuncia.values()) totais.put(etapa, repository.countByStatus(etapa));
+        return new br.jus.tjpb.lyno.litigancia.dto.PaginaDenuncias(denuncias.map(DenunciaResponse::from).getContent(),
+                denuncias.getTotalElements(), pagina, denuncias.getTotalPages(), totais);
     }
 
     @Transactional(readOnly = true)
     public DenunciaResponse buscar(Long id) {
         Denuncia d = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Denúncia não encontrada: " + id));
-        return DenunciaResponse.from(d);
+        var response = DenunciaResponse.from(d);
+        response.setHistorico(historicoRepository.findByDenunciaIdOrderByIdDesc(id));
+        return response;
     }
 
     @Transactional
     public DenunciaResponse atualizarStatus(Long id, StatusUpdateRequest request) {
         Denuncia d = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Denúncia não encontrada: " + id));
+        if (!java.util.Objects.equals(d.getVersao(), request.versao)) {
+            throw new org.springframework.orm.ObjectOptimisticLockingFailureException(Denuncia.class, id);
+        }
+        if ((request.limparVolume && request.volumeProcessualEstimado != null) ||
+                (request.limparComarcas && request.comarcasAtingidas != null)) {
+            throw new IllegalArgumentException("Não informe e limpe a mesma estimativa na mesma requisição");
+        }
+        var anterior = d.getStatus();
         if (request.status != null) {
             d.setStatus(request.status);
         }
@@ -83,10 +101,14 @@ public class DenunciaService {
             d.setComarcasAtingidas(request.comarcasAtingidas);
         }
         if (request.notaTecnicaResumo != null) {
-            d.setNotaTecnicaResumo(request.notaTecnicaResumo);
+            d.setNotaTecnicaResumo(request.notaTecnicaResumo.strip());
         }
+        if (request.limparVolume) d.setVolumeProcessualEstimado(null);
+        if (request.limparComarcas) d.setComarcasAtingidas(null);
         d.setDataAtualizacao(LocalDateTime.now(clock));
-        return DenunciaResponse.from(repository.save(d));
+        repository.saveAndFlush(d);
+        historicoRepository.save(new br.jus.tjpb.lyno.litigancia.model.Historico(d, anterior, "local", d.getDataAtualizacao()));
+        return buscar(id);
     }
 
     private String gerarNumeroProtocolo() {

@@ -55,6 +55,8 @@ export interface DenunciaRequest {
 
 export interface DenunciaResponse {
   id: number;
+  versao: number;
+  historico: HistoricoItem[];
   numeroProtocolo: string;
   comarca: string;
   nomeComunicante: string;
@@ -74,6 +76,35 @@ export interface DenunciaResponse {
   notaTecnicaResumo?: string;
   dataCriacao: string;
   dataAtualizacao: string;
+}
+
+export interface HistoricoItem {
+  id: number;
+  statusAnterior: StatusDenuncia | null;
+  statusNovo: StatusDenuncia;
+  autor: string;
+  data: string;
+  volume: number | null;
+  comarcas: number | null;
+  nota: string | null;
+}
+
+export interface PaginaDenuncias {
+  itens: DenunciaResponse[];
+  total: number;
+  pagina: number;
+  totalPaginas: number;
+  totaisPorStatus: Partial<Record<StatusDenuncia, number>>;
+}
+
+export interface StatusUpdateRequest {
+  versao: number;
+  status: StatusDenuncia;
+  volumeProcessualEstimado?: number;
+  comarcasAtingidas?: number;
+  notaTecnicaResumo: string;
+  limparVolume: boolean;
+  limparComarcas: boolean;
 }
 
 export interface KpisResponse {

@@ -29,8 +29,9 @@ public class DenunciaController {
     }
 
     @GetMapping
-    public List<DenunciaResponse> listar(@RequestParam(required = false) StatusDenuncia status) {
-        return service.listar(status);
+    public br.jus.tjpb.lyno.litigancia.dto.PaginaDenuncias listar(@RequestParam(required = false) StatusDenuncia status,
+            @RequestParam(defaultValue = "0") int pagina, @RequestParam(defaultValue = "25") int tamanho) {
+        return service.listar(status, pagina, tamanho);
     }
 
     @GetMapping("/{id}")
