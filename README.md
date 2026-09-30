@@ -17,9 +17,9 @@ docker compose up --build
 - Painel de controle: http://localhost:4200/painel
 - API: http://localhost:8080/api
 
-O banco sobe com **~55 denúncias de demonstração** (`backend/src/main/resources/data.sql`),
+O Compose usa o perfil `demo`, com **55 denúncias de demonstração** (`backend/src/main/resources/demo/data.sql`),
 espalhadas por 20 comarcas da Paraíba, com OABs reincidentes propositais para o ranking e
-datas nas últimas 12 semanas para a tendência — assim o painel já nasce populado para a oficina,
+datas relativas à semana da primeira carga para a tendência — assim o painel já nasce populado para a oficina,
 sem precisar cadastrar nada manualmente.
 
 Para começar do zero, remova o volume: `docker compose down -v`.
@@ -29,7 +29,7 @@ Para começar do zero, remova o volume: `docker compose down -v`.
 **Backend** (Java 21 + Maven, requer um PostgreSQL local — veja variáveis em `application.yml`):
 ```bash
 cd backend
-mvn spring-boot:run
+mvn spring-boot:run -Dspring-boot.run.profiles=demo
 ```
 
 **Frontend** (Node 20+):
@@ -78,4 +78,16 @@ litigancia-predatoria/
 ├── backend/    # Spring Boot 3 (Java 21), REST API + JPA + PostgreSQL
 ├── frontend/   # Angular 17 standalone, Chart.js
 └── docker-compose.yml
+```
+
+## Testes e referência
+
+O documento original e o mapeamento do escopo estão em [`doc/`](doc/ESCOPO.md).
+O banco é versionado com Flyway; fora do perfil `demo`, não há carga de dados fictícios.
+
+Testes de integração contra PostgreSQL real, em ambiente Docker separado:
+
+```bash
+docker compose -p litigancia-validacao -f compose.test.yml up --build --abort-on-container-exit --exit-code-from backend-test
+docker compose -p litigancia-validacao -f compose.test.yml down
 ```

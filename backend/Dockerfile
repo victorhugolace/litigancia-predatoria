@@ -1,8 +1,13 @@
-FROM maven:3.9-eclipse-temurin-21 AS build
+FROM maven:3.9-eclipse-temurin-21 AS source
 WORKDIR /app
 COPY pom.xml .
 RUN mvn -B dependency:go-offline
 COPY src ./src
+
+FROM source AS test
+CMD ["mvn", "-B", "verify"]
+
+FROM source AS build
 RUN mvn -B clean package -DskipTests
 
 FROM eclipse-temurin:21-jre-alpine

@@ -41,9 +41,9 @@ public class DenunciaResponse {
         r.tipologia = d.getTipologia();
         r.tipologiaDescricao = d.getTipologia() != null ? d.getTipologia().getDescricao() : null;
         r.tipologiaOutros = d.getTipologiaOutros();
-        r.processosParadigmas = d.getProcessosParadigmas();
+        r.processosParadigmas = List.copyOf(d.getProcessosParadigmas());
         r.relato = d.getRelato();
-        r.anexos = d.getAnexos();
+        r.anexos = List.copyOf(d.getAnexos());
         r.status = d.getStatus();
         r.statusDescricao = d.getStatus() != null ? d.getStatus().getDescricao() : null;
         r.volumeProcessualEstimado = d.getVolumeProcessualEstimado();

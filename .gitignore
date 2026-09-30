@@ -15,3 +15,7 @@ dist/
 .env
 .vscode/
 *.log
+**/target/
+tmp/
+**/test-results/
+**/playwright-report/

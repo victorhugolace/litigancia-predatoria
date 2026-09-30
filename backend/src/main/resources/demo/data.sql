@@ -3,7 +3,7 @@
 
 WITH ins AS (
   INSERT INTO denuncias (numero_protocolo, comarca, nome_comunicante, matricula_comunicante, oab_advogado, cpf_cnpj_parte, tipologia, tipologia_outros, relato, status, volume_processual_estimado, comarcas_atingidas, data_criacao, data_atualizacao)
-  VALUES ('LP-SEED-000001', 'Areia', 'Juíza Helena Nóbrega', 'MAT2110', 'PB98265', NULL, 'FALSIFICACAO_DOCUMENTO', NULL, 'Fracionamento de pedidos para burlar o rito dos juizados especiais.', 'EM_PROVIDENCIA_CORREGEDORIA', 1496, 10, TIMESTAMP '2026-05-24 05:00:00', TIMESTAMP '2026-05-24 05:00:00')
+  VALUES ('LP-SEED-000001', 'Areia', 'Juíza Helena Nóbrega', 'MAT2110', 'PB98265', NULL, 'FALSIFICACAO_DOCUMENTO', NULL, 'Fracionamento de pedidos para burlar o rito dos juizados especiais.', 'EM_PROVIDENCIA_CORREGEDORIA', 1496, 10, date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '46 hours', date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '46 hours')
   ON CONFLICT (numero_protocolo) DO NOTHING
   RETURNING id
 )
@@ -12,7 +12,7 @@ SELECT id, p FROM ins, unnest(ARRAY['5661907-29.2024.8.11.1675', '2556017-58.202
 
 WITH ins AS (
   INSERT INTO denuncias (numero_protocolo, comarca, nome_comunicante, matricula_comunicante, oab_advogado, cpf_cnpj_parte, tipologia, tipologia_outros, relato, status, volume_processual_estimado, comarcas_atingidas, data_criacao, data_atualizacao)
-  VALUES ('LP-SEED-000002', 'Santa Rita', 'Juíza Renata Sales', 'MAT1987', 'PB23456', NULL, 'OUTROS', 'Reciclagem de laudos periciais adulterados', 'Mesmo advogado ajuizou dezenas de ações idênticas de consignado em poucos dias.', 'ARQUIVADO', 286, 4, TIMESTAMP '2026-06-22 16:00:00', TIMESTAMP '2026-06-22 16:00:00')
+  VALUES ('LP-SEED-000002', 'Santa Rita', 'Juíza Renata Sales', 'MAT1987', 'PB23456', NULL, 'OUTROS', 'Reciclagem de laudos periciais adulterados', 'Mesmo advogado ajuizou dezenas de ações idênticas de consignado em poucos dias.', 'ARQUIVADO', 286, 4, date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '706 hours', date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '706 hours')
   ON CONFLICT (numero_protocolo) DO NOTHING
   RETURNING id
 )
@@ -21,7 +21,7 @@ SELECT id, p FROM ins, unnest(ARRAY['5663623-68.2026.8.12.2665', '7210606-55.202
 
 WITH ins AS (
   INSERT INTO denuncias (numero_protocolo, comarca, nome_comunicante, matricula_comunicante, oab_advogado, cpf_cnpj_parte, tipologia, tipologia_outros, relato, status, volume_processual_estimado, comarcas_atingidas, data_criacao, data_atualizacao)
-  VALUES ('LP-SEED-000003', 'Piancó', 'Juíza Camila Duarte', 'MAT2299', 'PB45678', '99827297893', 'CAPTACAO_ILICITA_CLIENTELA', NULL, 'Comprovantes de residência reciclados identificados em múltiplos processos.', 'EM_ANALISE_NUMOPED', 2281, 14, TIMESTAMP '2026-06-06 16:00:00', TIMESTAMP '2026-06-06 16:00:00')
+  VALUES ('LP-SEED-000003', 'Piancó', 'Juíza Camila Duarte', 'MAT2299', 'PB45678', '99827297893', 'CAPTACAO_ILICITA_CLIENTELA', NULL, 'Comprovantes de residência reciclados identificados em múltiplos processos.', 'EM_ANALISE_NUMOPED', 2281, 14, date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '347 hours', date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '347 hours')
   ON CONFLICT (numero_protocolo) DO NOTHING
   RETURNING id
 )
@@ -30,7 +30,7 @@ SELECT id, p FROM ins, unnest(ARRAY['8187926-84.2025.8.12.3594', '3320821-75.202
 
 WITH ins AS (
   INSERT INTO denuncias (numero_protocolo, comarca, nome_comunicante, matricula_comunicante, oab_advogado, cpf_cnpj_parte, tipologia, tipologia_outros, relato, status, volume_processual_estimado, comarcas_atingidas, data_criacao, data_atualizacao)
-  VALUES ('LP-SEED-000004', 'João Pessoa', 'Juíza Renata Sales', 'MAT1987', 'PB51952', NULL, 'ACAO_SEM_CONSENTIMENTO', NULL, 'Petições iniciais com texto quase idêntico, mudando apenas nome da parte.', 'EM_ANALISE_NUMOPED', 2338, 2, TIMESTAMP '2026-08-05 17:00:00', TIMESTAMP '2026-08-05 17:00:00')
+  VALUES ('LP-SEED-000004', 'João Pessoa', 'Juíza Renata Sales', 'MAT1987', 'PB51952', NULL, 'ACAO_SEM_CONSENTIMENTO', NULL, 'Petições iniciais com texto quase idêntico, mudando apenas nome da parte.', 'EM_ANALISE_NUMOPED', 2338, 2, date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '1693 hours', date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '1693 hours')
   ON CONFLICT (numero_protocolo) DO NOTHING
   RETURNING id
 )
@@ -39,7 +39,7 @@ SELECT id, p FROM ins, unnest(ARRAY['3653446-68.2024.8.09.8202', '3997281-74.202
 
 WITH ins AS (
   INSERT INTO denuncias (numero_protocolo, comarca, nome_comunicante, matricula_comunicante, oab_advogado, cpf_cnpj_parte, tipologia, tipologia_outros, relato, status, volume_processual_estimado, comarcas_atingidas, data_criacao, data_atualizacao)
-  VALUES ('LP-SEED-000005', 'Patos', 'Juíza Patrícia Lima', 'MAT1962', 'PB86781', NULL, 'FALSIFICACAO_DOCUMENTO', NULL, 'Procurações com assinaturas visivelmente distintas das partes autoras.', 'EM_PROVIDENCIA_CORREGEDORIA', 917, 1, TIMESTAMP '2026-07-14 06:00:00', TIMESTAMP '2026-07-14 06:00:00')
+  VALUES ('LP-SEED-000005', 'Patos', 'Juíza Patrícia Lima', 'MAT1962', 'PB86781', NULL, 'FALSIFICACAO_DOCUMENTO', NULL, 'Procurações com assinaturas visivelmente distintas das partes autoras.', 'EM_PROVIDENCIA_CORREGEDORIA', 917, 1, date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '1190 hours', date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '1190 hours')
   ON CONFLICT (numero_protocolo) DO NOTHING
   RETURNING id
 )
@@ -48,7 +48,7 @@ SELECT id, p FROM ins, unnest(ARRAY['9852897-87.2025.8.07.8836', '4374754-49.202
 
 WITH ins AS (
   INSERT INTO denuncias (numero_protocolo, comarca, nome_comunicante, matricula_comunicante, oab_advogado, cpf_cnpj_parte, tipologia, tipologia_outros, relato, status, volume_processual_estimado, comarcas_atingidas, data_criacao, data_atualizacao)
-  VALUES ('LP-SEED-000006', 'Patos', 'Juiz Marcos Andrade', 'MAT2201', 'PB12345', NULL, 'FALSIFICACAO_DOCUMENTO', NULL, 'Advogado de outro estado concentrando dezenas de ações na mesma vara.', 'EM_ANALISE_NUMOPED', 418, 1, TIMESTAMP '2026-08-06 03:00:00', TIMESTAMP '2026-08-06 03:00:00')
+  VALUES ('LP-SEED-000006', 'Patos', 'Juiz Marcos Andrade', 'MAT2201', 'PB12345', NULL, 'FALSIFICACAO_DOCUMENTO', NULL, 'Advogado de outro estado concentrando dezenas de ações na mesma vara.', 'EM_ANALISE_NUMOPED', 418, 1, date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '1702 hours', date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '1702 hours')
   ON CONFLICT (numero_protocolo) DO NOTHING
   RETURNING id
 )
@@ -57,7 +57,7 @@ SELECT id, p FROM ins, unnest(ARRAY['3219824-83.2026.8.16.3982', '8935169-62.202
 
 WITH ins AS (
   INSERT INTO denuncias (numero_protocolo, comarca, nome_comunicante, matricula_comunicante, oab_advogado, cpf_cnpj_parte, tipologia, tipologia_outros, relato, status, volume_processual_estimado, comarcas_atingidas, data_criacao, data_atualizacao)
-  VALUES ('LP-SEED-000007', 'Esperança', 'Juíza Camila Duarte', 'MAT2299', 'PB98598', '83831385071', 'FATIAMENTO_PEDIDOS', NULL, 'Petições iniciais com texto quase idêntico, mudando apenas nome da parte.', 'AGUARDANDO_NOTA_TECNICA', 2291, 11, TIMESTAMP '2026-06-19 02:00:00', TIMESTAMP '2026-06-19 02:00:00')
+  VALUES ('LP-SEED-000007', 'Esperança', 'Juíza Camila Duarte', 'MAT2299', 'PB98598', '83831385071', 'FATIAMENTO_PEDIDOS', NULL, 'Petições iniciais com texto quase idêntico, mudando apenas nome da parte.', 'AGUARDANDO_NOTA_TECNICA', 2291, 11, date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '626 hours', date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '626 hours')
   ON CONFLICT (numero_protocolo) DO NOTHING
   RETURNING id
 )
@@ -66,7 +66,7 @@ SELECT id, p FROM ins, unnest(ARRAY['5191056-19.2025.8.18.1605', '1848731-93.202
 
 WITH ins AS (
   INSERT INTO denuncias (numero_protocolo, comarca, nome_comunicante, matricula_comunicante, oab_advogado, cpf_cnpj_parte, tipologia, tipologia_outros, relato, status, volume_processual_estimado, comarcas_atingidas, data_criacao, data_atualizacao)
-  VALUES ('LP-SEED-000008', 'Mamanguape', 'Juiz Fábio Cavalcanti', 'MAT2054', 'PB23456', NULL, 'CAPTACAO_ILICITA_CLIENTELA', NULL, 'Parte autora afirma desconhecer a ação distribuída em seu nome.', 'AGUARDANDO_NOTA_TECNICA', 1023, 10, TIMESTAMP '2026-07-28 06:00:00', TIMESTAMP '2026-07-28 06:00:00')
+  VALUES ('LP-SEED-000008', 'Mamanguape', 'Juiz Fábio Cavalcanti', 'MAT2054', 'PB23456', NULL, 'CAPTACAO_ILICITA_CLIENTELA', NULL, 'Parte autora afirma desconhecer a ação distribuída em seu nome.', 'AGUARDANDO_NOTA_TECNICA', 1023, 10, date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '1503 hours', date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '1503 hours')
   ON CONFLICT (numero_protocolo) DO NOTHING
   RETURNING id
 )
@@ -75,7 +75,7 @@ SELECT id, p FROM ins, unnest(ARRAY['1841248-84.2025.8.17.8702', '3641282-17.202
 
 WITH ins AS (
   INSERT INTO denuncias (numero_protocolo, comarca, nome_comunicante, matricula_comunicante, oab_advogado, cpf_cnpj_parte, tipologia, tipologia_outros, relato, status, volume_processual_estimado, comarcas_atingidas, data_criacao, data_atualizacao)
-  VALUES ('LP-SEED-000009', 'Cuité', 'Juiz Marcos Andrade', 'MAT2201', 'PB55697', NULL, 'CAPTACAO_ILICITA_CLIENTELA', NULL, 'Petições iniciais com texto quase idêntico, mudando apenas nome da parte.', 'EM_ANALISE_NUMOPED', 2087, 5, TIMESTAMP '2026-06-05 18:00:00', TIMESTAMP '2026-06-05 18:00:00')
+  VALUES ('LP-SEED-000009', 'Cuité', 'Juiz Marcos Andrade', 'MAT2201', 'PB55697', NULL, 'CAPTACAO_ILICITA_CLIENTELA', NULL, 'Petições iniciais com texto quase idêntico, mudando apenas nome da parte.', 'EM_ANALISE_NUMOPED', 2087, 5, date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '327 hours', date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '327 hours')
   ON CONFLICT (numero_protocolo) DO NOTHING
   RETURNING id
 )
@@ -84,7 +84,7 @@ SELECT id, p FROM ins, unnest(ARRAY['6271130-40.2025.8.13.2145', '6033115-68.202
 
 WITH ins AS (
   INSERT INTO denuncias (numero_protocolo, comarca, nome_comunicante, matricula_comunicante, oab_advogado, cpf_cnpj_parte, tipologia, tipologia_outros, relato, status, volume_processual_estimado, comarcas_atingidas, data_criacao, data_atualizacao)
-  VALUES ('LP-SEED-000010', 'Cajazeiras', 'Juíza Camila Duarte', 'MAT2299', 'PB95962', '32698848018', 'FATIAMENTO_PEDIDOS', NULL, 'Petições iniciais com texto quase idêntico, mudando apenas nome da parte.', 'AGUARDANDO_NOTA_TECNICA', 1096, 9, TIMESTAMP '2026-07-17 03:00:00', TIMESTAMP '2026-07-17 03:00:00')
+  VALUES ('LP-SEED-000010', 'Cajazeiras', 'Juíza Camila Duarte', 'MAT2299', 'PB95962', '32698848018', 'FATIAMENTO_PEDIDOS', NULL, 'Petições iniciais com texto quase idêntico, mudando apenas nome da parte.', 'AGUARDANDO_NOTA_TECNICA', 1096, 9, date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '1254 hours', date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '1254 hours')
   ON CONFLICT (numero_protocolo) DO NOTHING
   RETURNING id
 )
@@ -93,7 +93,7 @@ SELECT id, p FROM ins, unnest(ARRAY['6022741-94.2024.8.05.4334', '2936571-23.202
 
 WITH ins AS (
   INSERT INTO denuncias (numero_protocolo, comarca, nome_comunicante, matricula_comunicante, oab_advogado, cpf_cnpj_parte, tipologia, tipologia_outros, relato, status, volume_processual_estimado, comarcas_atingidas, data_criacao, data_atualizacao)
-  VALUES ('LP-SEED-000011', 'Mamanguape', 'Juiz Ricardo Farias', 'MAT1875', 'PB92590', '68558805795', 'TESE_ARTIFICIAL_MASSA', NULL, 'Parte autora afirma desconhecer a ação distribuída em seu nome.', 'NOVO', NULL, NULL, TIMESTAMP '2026-06-03 20:00:00', TIMESTAMP '2026-06-03 20:00:00')
+  VALUES ('LP-SEED-000011', 'Mamanguape', 'Juiz Ricardo Farias', 'MAT1875', 'PB92590', '68558805795', 'TESE_ARTIFICIAL_MASSA', NULL, 'Parte autora afirma desconhecer a ação distribuída em seu nome.', 'NOVO', NULL, NULL, date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '284 hours', date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '284 hours')
   ON CONFLICT (numero_protocolo) DO NOTHING
   RETURNING id
 )
@@ -102,7 +102,7 @@ SELECT id, p FROM ins, unnest(ARRAY['5394880-30.2026.8.15.9039', '8175395-81.202
 
 WITH ins AS (
   INSERT INTO denuncias (numero_protocolo, comarca, nome_comunicante, matricula_comunicante, oab_advogado, cpf_cnpj_parte, tipologia, tipologia_outros, relato, status, volume_processual_estimado, comarcas_atingidas, data_criacao, data_atualizacao)
-  VALUES ('LP-SEED-000012', 'Areia', 'Juiz Fábio Cavalcanti', 'MAT2054', 'PB34567', NULL, 'TESE_ARTIFICIAL_MASSA', NULL, 'Parte autora afirma desconhecer a ação distribuída em seu nome.', 'ARQUIVADO', 1031, 5, TIMESTAMP '2026-07-01 11:00:00', TIMESTAMP '2026-07-01 11:00:00')
+  VALUES ('LP-SEED-000012', 'Areia', 'Juiz Fábio Cavalcanti', 'MAT2054', 'PB34567', NULL, 'TESE_ARTIFICIAL_MASSA', NULL, 'Parte autora afirma desconhecer a ação distribuída em seu nome.', 'ARQUIVADO', 1031, 5, date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '903 hours', date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '903 hours')
   ON CONFLICT (numero_protocolo) DO NOTHING
   RETURNING id
 )
@@ -111,7 +111,7 @@ SELECT id, p FROM ins, unnest(ARRAY['5186414-95.2024.8.12.9174', '7817881-89.202
 
 WITH ins AS (
   INSERT INTO denuncias (numero_protocolo, comarca, nome_comunicante, matricula_comunicante, oab_advogado, cpf_cnpj_parte, tipologia, tipologia_outros, relato, status, volume_processual_estimado, comarcas_atingidas, data_criacao, data_atualizacao)
-  VALUES ('LP-SEED-000013', 'Guarabira', 'Juíza Renata Sales', 'MAT1987', 'PB12345', NULL, 'FALSIFICACAO_DOCUMENTO', NULL, 'Advogado de outro estado concentrando dezenas de ações na mesma vara.', 'EM_PROVIDENCIA_CORREGEDORIA', 171, 2, TIMESTAMP '2026-05-30 16:00:00', TIMESTAMP '2026-05-30 16:00:00')
+  VALUES ('LP-SEED-000013', 'Guarabira', 'Juíza Renata Sales', 'MAT1987', 'PB12345', NULL, 'FALSIFICACAO_DOCUMENTO', NULL, 'Advogado de outro estado concentrando dezenas de ações na mesma vara.', 'EM_PROVIDENCIA_CORREGEDORIA', 171, 2, date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '190 hours', date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '190 hours')
   ON CONFLICT (numero_protocolo) DO NOTHING
   RETURNING id
 )
@@ -120,7 +120,7 @@ SELECT id, p FROM ins, unnest(ARRAY['6120253-39.2024.8.01.3165', '7685149-52.202
 
 WITH ins AS (
   INSERT INTO denuncias (numero_protocolo, comarca, nome_comunicante, matricula_comunicante, oab_advogado, cpf_cnpj_parte, tipologia, tipologia_outros, relato, status, volume_processual_estimado, comarcas_atingidas, data_criacao, data_atualizacao)
-  VALUES ('LP-SEED-000014', 'Cuité', 'Juiz André Barbosa', 'MAT2033', 'PB34567', '82946737519', 'FALSIFICACAO_DOCUMENTO', NULL, 'Comprovantes de residência reciclados identificados em múltiplos processos.', 'ARQUIVADO', 536, 4, TIMESTAMP '2026-07-06 07:00:00', TIMESTAMP '2026-07-06 07:00:00')
+  VALUES ('LP-SEED-000014', 'Cuité', 'Juiz André Barbosa', 'MAT2033', 'PB34567', '82946737519', 'FALSIFICACAO_DOCUMENTO', NULL, 'Comprovantes de residência reciclados identificados em múltiplos processos.', 'ARQUIVADO', 536, 4, date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '1011 hours', date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '1011 hours')
   ON CONFLICT (numero_protocolo) DO NOTHING
   RETURNING id
 )
@@ -129,7 +129,7 @@ SELECT id, p FROM ins, unnest(ARRAY['1744682-65.2024.8.17.8822', '4305700-56.202
 
 WITH ins AS (
   INSERT INTO denuncias (numero_protocolo, comarca, nome_comunicante, matricula_comunicante, oab_advogado, cpf_cnpj_parte, tipologia, tipologia_outros, relato, status, volume_processual_estimado, comarcas_atingidas, data_criacao, data_atualizacao)
-  VALUES ('LP-SEED-000015', 'Areia', 'Juiz André Barbosa', 'MAT2033', 'PB95962', '51098994137', 'FATIAMENTO_PEDIDOS', NULL, 'Petições iniciais com texto quase idêntico, mudando apenas nome da parte.', 'EM_PROVIDENCIA_CORREGEDORIA', 1286, 4, TIMESTAMP '2026-08-01 17:00:00', TIMESTAMP '2026-08-01 17:00:00')
+  VALUES ('LP-SEED-000015', 'Areia', 'Juiz André Barbosa', 'MAT2033', 'PB95962', '51098994137', 'FATIAMENTO_PEDIDOS', NULL, 'Petições iniciais com texto quase idêntico, mudando apenas nome da parte.', 'EM_PROVIDENCIA_CORREGEDORIA', 1286, 4, date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '1603 hours', date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '1603 hours')
   ON CONFLICT (numero_protocolo) DO NOTHING
   RETURNING id
 )
@@ -138,7 +138,7 @@ SELECT id, p FROM ins, unnest(ARRAY['4526280-65.2026.8.20.5280', '8801207-66.202
 
 WITH ins AS (
   INSERT INTO denuncias (numero_protocolo, comarca, nome_comunicante, matricula_comunicante, oab_advogado, cpf_cnpj_parte, tipologia, tipologia_outros, relato, status, volume_processual_estimado, comarcas_atingidas, data_criacao, data_atualizacao)
-  VALUES ('LP-SEED-000016', 'Santa Rita', 'Juiz Fábio Cavalcanti', 'MAT2054', 'PB23456', NULL, 'CAPTACAO_ILICITA_CLIENTELA', NULL, 'Advogado de outro estado concentrando dezenas de ações na mesma vara.', 'EM_PROVIDENCIA_CORREGEDORIA', 1827, 10, TIMESTAMP '2026-05-28 14:00:00', TIMESTAMP '2026-05-28 14:00:00')
+  VALUES ('LP-SEED-000016', 'Santa Rita', 'Juiz Fábio Cavalcanti', 'MAT2054', 'PB23456', NULL, 'CAPTACAO_ILICITA_CLIENTELA', NULL, 'Advogado de outro estado concentrando dezenas de ações na mesma vara.', 'EM_PROVIDENCIA_CORREGEDORIA', 1827, 10, date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '144 hours', date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '144 hours')
   ON CONFLICT (numero_protocolo) DO NOTHING
   RETURNING id
 )
@@ -147,7 +147,7 @@ SELECT id, p FROM ins, unnest(ARRAY['4262081-99.2025.8.16.6548', '5093379-28.202
 
 WITH ins AS (
   INSERT INTO denuncias (numero_protocolo, comarca, nome_comunicante, matricula_comunicante, oab_advogado, cpf_cnpj_parte, tipologia, tipologia_outros, relato, status, volume_processual_estimado, comarcas_atingidas, data_criacao, data_atualizacao)
-  VALUES ('LP-SEED-000017', 'Solânea', 'Juiz André Barbosa', 'MAT2033', 'PB51952', '78124601904', 'CAPTACAO_ILICITA_CLIENTELA', NULL, 'Petições iniciais com texto quase idêntico, mudando apenas nome da parte.', 'EM_PROVIDENCIA_CORREGEDORIA', 1610, 15, TIMESTAMP '2026-07-17 11:00:00', TIMESTAMP '2026-07-17 11:00:00')
+  VALUES ('LP-SEED-000017', 'Solânea', 'Juiz André Barbosa', 'MAT2033', 'PB51952', '78124601904', 'CAPTACAO_ILICITA_CLIENTELA', NULL, 'Petições iniciais com texto quase idêntico, mudando apenas nome da parte.', 'EM_PROVIDENCIA_CORREGEDORIA', 1610, 15, date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '1262 hours', date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '1262 hours')
   ON CONFLICT (numero_protocolo) DO NOTHING
   RETURNING id
 )
@@ -156,7 +156,7 @@ SELECT id, p FROM ins, unnest(ARRAY['5013879-45.2025.8.03.4682', '4934149-44.202
 
 WITH ins AS (
   INSERT INTO denuncias (numero_protocolo, comarca, nome_comunicante, matricula_comunicante, oab_advogado, cpf_cnpj_parte, tipologia, tipologia_outros, relato, status, volume_processual_estimado, comarcas_atingidas, data_criacao, data_atualizacao)
-  VALUES ('LP-SEED-000018', 'Piancó', 'Juiz Marcos Andrade', 'MAT2201', 'PB86781', NULL, 'CAPTACAO_ILICITA_CLIENTELA', NULL, 'Petições iniciais com texto quase idêntico, mudando apenas nome da parte.', 'ARQUIVADO', 1770, 3, TIMESTAMP '2026-08-02 04:00:00', TIMESTAMP '2026-08-02 04:00:00')
+  VALUES ('LP-SEED-000018', 'Piancó', 'Juiz Marcos Andrade', 'MAT2201', 'PB86781', NULL, 'CAPTACAO_ILICITA_CLIENTELA', NULL, 'Petições iniciais com texto quase idêntico, mudando apenas nome da parte.', 'ARQUIVADO', 1770, 3, date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '1614 hours', date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '1614 hours')
   ON CONFLICT (numero_protocolo) DO NOTHING
   RETURNING id
 )
@@ -165,7 +165,7 @@ SELECT id, p FROM ins, unnest(ARRAY['8030010-78.2026.8.18.9884', '4700025-72.202
 
 WITH ins AS (
   INSERT INTO denuncias (numero_protocolo, comarca, nome_comunicante, matricula_comunicante, oab_advogado, cpf_cnpj_parte, tipologia, tipologia_outros, relato, status, volume_processual_estimado, comarcas_atingidas, data_criacao, data_atualizacao)
-  VALUES ('LP-SEED-000019', 'Itaporanga', 'Juiz Fábio Cavalcanti', 'MAT2054', 'PB45678', '54902591705', 'FATIAMENTO_PEDIDOS', NULL, 'Petições iniciais com texto quase idêntico, mudando apenas nome da parte.', 'ARQUIVADO', 484, 13, TIMESTAMP '2026-07-22 05:00:00', TIMESTAMP '2026-07-22 05:00:00')
+  VALUES ('LP-SEED-000019', 'Itaporanga', 'Juiz Fábio Cavalcanti', 'MAT2054', 'PB45678', '54902591705', 'FATIAMENTO_PEDIDOS', NULL, 'Petições iniciais com texto quase idêntico, mudando apenas nome da parte.', 'ARQUIVADO', 484, 13, date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '1368 hours', date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '1368 hours')
   ON CONFLICT (numero_protocolo) DO NOTHING
   RETURNING id
 )
@@ -174,7 +174,7 @@ SELECT id, p FROM ins, unnest(ARRAY['5232413-20.2025.8.01.8838', '1873851-54.202
 
 WITH ins AS (
   INSERT INTO denuncias (numero_protocolo, comarca, nome_comunicante, matricula_comunicante, oab_advogado, cpf_cnpj_parte, tipologia, tipologia_outros, relato, status, volume_processual_estimado, comarcas_atingidas, data_criacao, data_atualizacao)
-  VALUES ('LP-SEED-000020', 'Guarabira', 'Juiz Ricardo Farias', 'MAT1875', 'PB12345', NULL, 'CAPTACAO_ILICITA_CLIENTELA', NULL, 'Fracionamento de pedidos para burlar o rito dos juizados especiais.', 'ARQUIVADO', 641, 7, TIMESTAMP '2026-05-23 10:00:00', TIMESTAMP '2026-05-23 10:00:00')
+  VALUES ('LP-SEED-000020', 'Guarabira', 'Juiz Ricardo Farias', 'MAT1875', 'PB12345', NULL, 'CAPTACAO_ILICITA_CLIENTELA', NULL, 'Fracionamento de pedidos para burlar o rito dos juizados especiais.', 'ARQUIVADO', 641, 7, date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '28 hours', date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '28 hours')
   ON CONFLICT (numero_protocolo) DO NOTHING
   RETURNING id
 )
@@ -183,7 +183,7 @@ SELECT id, p FROM ins, unnest(ARRAY['4327421-19.2026.8.08.1670', '6059717-97.202
 
 WITH ins AS (
   INSERT INTO denuncias (numero_protocolo, comarca, nome_comunicante, matricula_comunicante, oab_advogado, cpf_cnpj_parte, tipologia, tipologia_outros, relato, status, volume_processual_estimado, comarcas_atingidas, data_criacao, data_atualizacao)
-  VALUES ('LP-SEED-000021', 'Guarabira', 'Juiz Ricardo Farias', 'MAT1875', 'PB85713', NULL, 'CAPTACAO_ILICITA_CLIENTELA', NULL, 'Petições iniciais com texto quase idêntico, mudando apenas nome da parte.', 'AGUARDANDO_NOTA_TECNICA', 1146, 9, TIMESTAMP '2026-05-28 02:00:00', TIMESTAMP '2026-05-28 02:00:00')
+  VALUES ('LP-SEED-000021', 'Guarabira', 'Juiz Ricardo Farias', 'MAT1875', 'PB85713', NULL, 'CAPTACAO_ILICITA_CLIENTELA', NULL, 'Petições iniciais com texto quase idêntico, mudando apenas nome da parte.', 'AGUARDANDO_NOTA_TECNICA', 1146, 9, date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '133 hours', date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '133 hours')
   ON CONFLICT (numero_protocolo) DO NOTHING
   RETURNING id
 )
@@ -192,7 +192,7 @@ SELECT id, p FROM ins, unnest(ARRAY['5118725-21.2025.8.15.3996', '8796514-82.202
 
 WITH ins AS (
   INSERT INTO denuncias (numero_protocolo, comarca, nome_comunicante, matricula_comunicante, oab_advogado, cpf_cnpj_parte, tipologia, tipologia_outros, relato, status, volume_processual_estimado, comarcas_atingidas, data_criacao, data_atualizacao)
-  VALUES ('LP-SEED-000022', 'João Pessoa', 'Juíza Helena Nóbrega', 'MAT2110', 'PB45678', '43321063465', 'ACAO_SEM_CONSENTIMENTO', NULL, 'Advogado de outro estado concentrando dezenas de ações na mesma vara.', 'EM_PROVIDENCIA_CORREGEDORIA', 2209, 13, TIMESTAMP '2026-07-03 21:00:00', TIMESTAMP '2026-07-03 21:00:00')
+  VALUES ('LP-SEED-000022', 'João Pessoa', 'Juíza Helena Nóbrega', 'MAT2110', 'PB45678', '43321063465', 'ACAO_SEM_CONSENTIMENTO', NULL, 'Advogado de outro estado concentrando dezenas de ações na mesma vara.', 'EM_PROVIDENCIA_CORREGEDORIA', 2209, 13, date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '957 hours', date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '957 hours')
   ON CONFLICT (numero_protocolo) DO NOTHING
   RETURNING id
 )
@@ -201,7 +201,7 @@ SELECT id, p FROM ins, unnest(ARRAY['1289293-21.2025.8.08.6626', '5081983-49.202
 
 WITH ins AS (
   INSERT INTO denuncias (numero_protocolo, comarca, nome_comunicante, matricula_comunicante, oab_advogado, cpf_cnpj_parte, tipologia, tipologia_outros, relato, status, volume_processual_estimado, comarcas_atingidas, data_criacao, data_atualizacao)
-  VALUES ('LP-SEED-000023', 'Guarabira', 'Juíza Helena Nóbrega', 'MAT2110', 'PB45678', '81984544780', 'CAPTACAO_ILICITA_CLIENTELA', NULL, 'Comprovantes de residência reciclados identificados em múltiplos processos.', 'ARQUIVADO', 770, 1, TIMESTAMP '2026-06-17 14:00:00', TIMESTAMP '2026-06-17 14:00:00')
+  VALUES ('LP-SEED-000023', 'Guarabira', 'Juíza Helena Nóbrega', 'MAT2110', 'PB45678', '81984544780', 'CAPTACAO_ILICITA_CLIENTELA', NULL, 'Comprovantes de residência reciclados identificados em múltiplos processos.', 'ARQUIVADO', 770, 1, date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '592 hours', date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '592 hours')
   ON CONFLICT (numero_protocolo) DO NOTHING
   RETURNING id
 )
@@ -210,7 +210,7 @@ SELECT id, p FROM ins, unnest(ARRAY['4816534-56.2024.8.10.0232', '9961299-26.202
 
 WITH ins AS (
   INSERT INTO denuncias (numero_protocolo, comarca, nome_comunicante, matricula_comunicante, oab_advogado, cpf_cnpj_parte, tipologia, tipologia_outros, relato, status, volume_processual_estimado, comarcas_atingidas, data_criacao, data_atualizacao)
-  VALUES ('LP-SEED-000024', 'Itabaiana', 'Juíza Patrícia Lima', 'MAT1962', 'PB12345', '87627591831', 'CAPTACAO_ILICITA_CLIENTELA', NULL, 'Procurações com assinaturas visivelmente distintas das partes autoras.', 'NOVO', NULL, NULL, TIMESTAMP '2026-05-24 18:00:00', TIMESTAMP '2026-05-24 18:00:00')
+  VALUES ('LP-SEED-000024', 'Itabaiana', 'Juíza Patrícia Lima', 'MAT1962', 'PB12345', '87627591831', 'CAPTACAO_ILICITA_CLIENTELA', NULL, 'Procurações com assinaturas visivelmente distintas das partes autoras.', 'NOVO', NULL, NULL, date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '58 hours', date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '58 hours')
   ON CONFLICT (numero_protocolo) DO NOTHING
   RETURNING id
 )
@@ -219,7 +219,7 @@ SELECT id, p FROM ins, unnest(ARRAY['2429098-41.2024.8.18.6819', '4786401-76.202
 
 WITH ins AS (
   INSERT INTO denuncias (numero_protocolo, comarca, nome_comunicante, matricula_comunicante, oab_advogado, cpf_cnpj_parte, tipologia, tipologia_outros, relato, status, volume_processual_estimado, comarcas_atingidas, data_criacao, data_atualizacao)
-  VALUES ('LP-SEED-000025', 'Itabaiana', 'Juíza Renata Sales', 'MAT1987', 'PB23456', NULL, 'FALSIFICACAO_DOCUMENTO', NULL, 'Advogado de outro estado concentrando dezenas de ações na mesma vara.', 'AGUARDANDO_NOTA_TECNICA', 2346, 15, TIMESTAMP '2026-07-22 15:00:00', TIMESTAMP '2026-07-22 15:00:00')
+  VALUES ('LP-SEED-000025', 'Itabaiana', 'Juíza Renata Sales', 'MAT1987', 'PB23456', NULL, 'FALSIFICACAO_DOCUMENTO', NULL, 'Advogado de outro estado concentrando dezenas de ações na mesma vara.', 'AGUARDANDO_NOTA_TECNICA', 2346, 15, date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '1377 hours', date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '1377 hours')
   ON CONFLICT (numero_protocolo) DO NOTHING
   RETURNING id
 )
@@ -228,7 +228,7 @@ SELECT id, p FROM ins, unnest(ARRAY['1547605-39.2025.8.10.7439', '2194198-97.202
 
 WITH ins AS (
   INSERT INTO denuncias (numero_protocolo, comarca, nome_comunicante, matricula_comunicante, oab_advogado, cpf_cnpj_parte, tipologia, tipologia_outros, relato, status, volume_processual_estimado, comarcas_atingidas, data_criacao, data_atualizacao)
-  VALUES ('LP-SEED-000026', 'Monteiro', 'Juíza Patrícia Lima', 'MAT1962', 'PB34567', NULL, 'TESE_ARTIFICIAL_MASSA', NULL, 'Advogado de outro estado concentrando dezenas de ações na mesma vara.', 'AGUARDANDO_NOTA_TECNICA', 1687, 6, TIMESTAMP '2026-06-13 13:00:00', TIMESTAMP '2026-06-13 13:00:00')
+  VALUES ('LP-SEED-000026', 'Monteiro', 'Juíza Patrícia Lima', 'MAT1962', 'PB34567', NULL, 'TESE_ARTIFICIAL_MASSA', NULL, 'Advogado de outro estado concentrando dezenas de ações na mesma vara.', 'AGUARDANDO_NOTA_TECNICA', 1687, 6, date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '501 hours', date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '501 hours')
   ON CONFLICT (numero_protocolo) DO NOTHING
   RETURNING id
 )
@@ -237,7 +237,7 @@ SELECT id, p FROM ins, unnest(ARRAY['2349590-86.2024.8.14.5281', '5200476-13.202
 
 WITH ins AS (
   INSERT INTO denuncias (numero_protocolo, comarca, nome_comunicante, matricula_comunicante, oab_advogado, cpf_cnpj_parte, tipologia, tipologia_outros, relato, status, volume_processual_estimado, comarcas_atingidas, data_criacao, data_atualizacao)
-  VALUES ('LP-SEED-000027', 'Catolé do Rocha', 'Juíza Renata Sales', 'MAT1987', 'PB94348', '50782728919', 'CAPTACAO_ILICITA_CLIENTELA', NULL, 'Todos os comprovantes de energia têm a mesma data de vencimento e tipografia alterada.', 'AGUARDANDO_NOTA_TECNICA', 133, 11, TIMESTAMP '2026-06-11 21:00:00', TIMESTAMP '2026-06-11 21:00:00')
+  VALUES ('LP-SEED-000027', 'Catolé do Rocha', 'Juíza Renata Sales', 'MAT1987', 'PB94348', '50782728919', 'CAPTACAO_ILICITA_CLIENTELA', NULL, 'Todos os comprovantes de energia têm a mesma data de vencimento e tipografia alterada.', 'AGUARDANDO_NOTA_TECNICA', 133, 11, date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '464 hours', date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '464 hours')
   ON CONFLICT (numero_protocolo) DO NOTHING
   RETURNING id
 )
@@ -246,7 +246,7 @@ SELECT id, p FROM ins, unnest(ARRAY['2477398-50.2025.8.11.1900', '7780932-75.202
 
 WITH ins AS (
   INSERT INTO denuncias (numero_protocolo, comarca, nome_comunicante, matricula_comunicante, oab_advogado, cpf_cnpj_parte, tipologia, tipologia_outros, relato, status, volume_processual_estimado, comarcas_atingidas, data_criacao, data_atualizacao)
-  VALUES ('LP-SEED-000028', 'Cuité', 'Juíza Helena Nóbrega', 'MAT2110', 'PB56717', NULL, 'CAPTACAO_ILICITA_CLIENTELA', NULL, 'Mesmo advogado ajuizou dezenas de ações idênticas de consignado em poucos dias.', 'NOVO', NULL, NULL, TIMESTAMP '2026-08-12 15:00:00', TIMESTAMP '2026-08-12 15:00:00')
+  VALUES ('LP-SEED-000028', 'Cuité', 'Juíza Helena Nóbrega', 'MAT2110', 'PB56717', NULL, 'CAPTACAO_ILICITA_CLIENTELA', NULL, 'Mesmo advogado ajuizou dezenas de ações idênticas de consignado em poucos dias.', 'NOVO', NULL, NULL, date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '1848 hours', date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '1848 hours')
   ON CONFLICT (numero_protocolo) DO NOTHING
   RETURNING id
 )
@@ -255,7 +255,7 @@ SELECT id, p FROM ins, unnest(ARRAY['2970754-92.2024.8.16.4782', '9537455-44.202
 
 WITH ins AS (
   INSERT INTO denuncias (numero_protocolo, comarca, nome_comunicante, matricula_comunicante, oab_advogado, cpf_cnpj_parte, tipologia, tipologia_outros, relato, status, volume_processual_estimado, comarcas_atingidas, data_criacao, data_atualizacao)
-  VALUES ('LP-SEED-000029', 'Monteiro', 'Juíza Patrícia Lima', 'MAT1962', 'PB88698', NULL, 'FATIAMENTO_PEDIDOS', NULL, 'Fracionamento de pedidos para burlar o rito dos juizados especiais.', 'AGUARDANDO_NOTA_TECNICA', 605, 7, TIMESTAMP '2026-08-11 01:00:00', TIMESTAMP '2026-08-11 01:00:00')
+  VALUES ('LP-SEED-000029', 'Monteiro', 'Juíza Patrícia Lima', 'MAT1962', 'PB88698', NULL, 'FATIAMENTO_PEDIDOS', NULL, 'Fracionamento de pedidos para burlar o rito dos juizados especiais.', 'AGUARDANDO_NOTA_TECNICA', 605, 7, date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '1813 hours', date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '1813 hours')
   ON CONFLICT (numero_protocolo) DO NOTHING
   RETURNING id
 )
@@ -264,7 +264,7 @@ SELECT id, p FROM ins, unnest(ARRAY['6398528-34.2026.8.08.9369', '7425184-39.202
 
 WITH ins AS (
   INSERT INTO denuncias (numero_protocolo, comarca, nome_comunicante, matricula_comunicante, oab_advogado, cpf_cnpj_parte, tipologia, tipologia_outros, relato, status, volume_processual_estimado, comarcas_atingidas, data_criacao, data_atualizacao)
-  VALUES ('LP-SEED-000030', 'Cajazeiras', 'Juíza Renata Sales', 'MAT1987', 'PB98265', '64514751164', 'CAPTACAO_ILICITA_CLIENTELA', NULL, 'Fracionamento de pedidos para burlar o rito dos juizados especiais.', 'ARQUIVADO', 1216, 6, TIMESTAMP '2026-07-02 23:00:00', TIMESTAMP '2026-07-02 23:00:00')
+  VALUES ('LP-SEED-000030', 'Cajazeiras', 'Juíza Renata Sales', 'MAT1987', 'PB98265', '64514751164', 'CAPTACAO_ILICITA_CLIENTELA', NULL, 'Fracionamento de pedidos para burlar o rito dos juizados especiais.', 'ARQUIVADO', 1216, 6, date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '937 hours', date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '937 hours')
   ON CONFLICT (numero_protocolo) DO NOTHING
   RETURNING id
 )
@@ -273,7 +273,7 @@ SELECT id, p FROM ins, unnest(ARRAY['9186400-79.2024.8.20.1122', '4938791-90.202
 
 WITH ins AS (
   INSERT INTO denuncias (numero_protocolo, comarca, nome_comunicante, matricula_comunicante, oab_advogado, cpf_cnpj_parte, tipologia, tipologia_outros, relato, status, volume_processual_estimado, comarcas_atingidas, data_criacao, data_atualizacao)
-  VALUES ('LP-SEED-000031', 'Pombal', 'Juiz André Barbosa', 'MAT2033', 'PB45678', NULL, 'TESE_ARTIFICIAL_MASSA', NULL, 'Mesmo advogado ajuizou dezenas de ações idênticas de consignado em poucos dias.', 'EM_ANALISE_NUMOPED', 1994, 2, TIMESTAMP '2026-07-18 12:00:00', TIMESTAMP '2026-07-18 12:00:00')
+  VALUES ('LP-SEED-000031', 'Pombal', 'Juiz André Barbosa', 'MAT2033', 'PB45678', NULL, 'TESE_ARTIFICIAL_MASSA', NULL, 'Mesmo advogado ajuizou dezenas de ações idênticas de consignado em poucos dias.', 'EM_ANALISE_NUMOPED', 1994, 2, date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '1285 hours', date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '1285 hours')
   ON CONFLICT (numero_protocolo) DO NOTHING
   RETURNING id
 )
@@ -282,7 +282,7 @@ SELECT id, p FROM ins, unnest(ARRAY['5040453-73.2026.8.05.3805', '8736811-91.202
 
 WITH ins AS (
   INSERT INTO denuncias (numero_protocolo, comarca, nome_comunicante, matricula_comunicante, oab_advogado, cpf_cnpj_parte, tipologia, tipologia_outros, relato, status, volume_processual_estimado, comarcas_atingidas, data_criacao, data_atualizacao)
-  VALUES ('LP-SEED-000032', 'Bayeux', 'Juiz André Barbosa', 'MAT2033', 'PB56140', '51658086456', 'FALSIFICACAO_DOCUMENTO', NULL, 'Fracionamento de pedidos para burlar o rito dos juizados especiais.', 'EM_PROVIDENCIA_CORREGEDORIA', 2388, 6, TIMESTAMP '2026-06-17 23:00:00', TIMESTAMP '2026-06-17 23:00:00')
+  VALUES ('LP-SEED-000032', 'Bayeux', 'Juiz André Barbosa', 'MAT2033', 'PB56140', '51658086456', 'FALSIFICACAO_DOCUMENTO', NULL, 'Fracionamento de pedidos para burlar o rito dos juizados especiais.', 'EM_PROVIDENCIA_CORREGEDORIA', 2388, 6, date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '600 hours', date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '600 hours')
   ON CONFLICT (numero_protocolo) DO NOTHING
   RETURNING id
 )
@@ -291,7 +291,7 @@ SELECT id, p FROM ins, unnest(ARRAY['1135861-82.2026.8.02.9936', '9333700-46.202
 
 WITH ins AS (
   INSERT INTO denuncias (numero_protocolo, comarca, nome_comunicante, matricula_comunicante, oab_advogado, cpf_cnpj_parte, tipologia, tipologia_outros, relato, status, volume_processual_estimado, comarcas_atingidas, data_criacao, data_atualizacao)
-  VALUES ('LP-SEED-000033', 'Cajazeiras', 'Juíza Renata Sales', 'MAT1987', 'PB94348', NULL, 'FALSIFICACAO_DOCUMENTO', NULL, 'Parte autora afirma desconhecer a ação distribuída em seu nome.', 'NOVO', NULL, NULL, TIMESTAMP '2026-06-26 03:00:00', TIMESTAMP '2026-06-26 03:00:00')
+  VALUES ('LP-SEED-000033', 'Cajazeiras', 'Juíza Renata Sales', 'MAT1987', 'PB94348', NULL, 'FALSIFICACAO_DOCUMENTO', NULL, 'Parte autora afirma desconhecer a ação distribuída em seu nome.', 'NOVO', NULL, NULL, date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '783 hours', date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '783 hours')
   ON CONFLICT (numero_protocolo) DO NOTHING
   RETURNING id
 )
@@ -300,7 +300,7 @@ SELECT id, p FROM ins, unnest(ARRAY['3760597-42.2025.8.10.5550', '2932227-69.202
 
 WITH ins AS (
   INSERT INTO denuncias (numero_protocolo, comarca, nome_comunicante, matricula_comunicante, oab_advogado, cpf_cnpj_parte, tipologia, tipologia_outros, relato, status, volume_processual_estimado, comarcas_atingidas, data_criacao, data_atualizacao)
-  VALUES ('LP-SEED-000034', 'Itabaiana', 'Juiz André Barbosa', 'MAT2033', 'PB98540', '75428766878', 'FALSIFICACAO_DOCUMENTO', NULL, 'Parte autora afirma desconhecer a ação distribuída em seu nome.', 'ARQUIVADO', 1873, 6, TIMESTAMP '2026-07-26 12:00:00', TIMESTAMP '2026-07-26 12:00:00')
+  VALUES ('LP-SEED-000034', 'Itabaiana', 'Juiz André Barbosa', 'MAT2033', 'PB98540', '75428766878', 'FALSIFICACAO_DOCUMENTO', NULL, 'Parte autora afirma desconhecer a ação distribuída em seu nome.', 'ARQUIVADO', 1873, 6, date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '1464 hours', date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '1464 hours')
   ON CONFLICT (numero_protocolo) DO NOTHING
   RETURNING id
 )
@@ -309,7 +309,7 @@ SELECT id, p FROM ins, unnest(ARRAY['2060605-91.2025.8.10.6690', '2957497-27.202
 
 WITH ins AS (
   INSERT INTO denuncias (numero_protocolo, comarca, nome_comunicante, matricula_comunicante, oab_advogado, cpf_cnpj_parte, tipologia, tipologia_outros, relato, status, volume_processual_estimado, comarcas_atingidas, data_criacao, data_atualizacao)
-  VALUES ('LP-SEED-000035', 'Princesa Isabel', 'Juiz André Barbosa', 'MAT2033', 'PB51739', '97681261401', 'FALSIFICACAO_DOCUMENTO', NULL, 'Fracionamento de pedidos para burlar o rito dos juizados especiais.', 'AGUARDANDO_NOTA_TECNICA', 1381, 4, TIMESTAMP '2026-08-10 23:00:00', TIMESTAMP '2026-08-10 23:00:00')
+  VALUES ('LP-SEED-000035', 'Princesa Isabel', 'Juiz André Barbosa', 'MAT2033', 'PB51739', '97681261401', 'FALSIFICACAO_DOCUMENTO', NULL, 'Fracionamento de pedidos para burlar o rito dos juizados especiais.', 'AGUARDANDO_NOTA_TECNICA', 1381, 4, date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '1811 hours', date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '1811 hours')
   ON CONFLICT (numero_protocolo) DO NOTHING
   RETURNING id
 )
@@ -318,7 +318,7 @@ SELECT id, p FROM ins, unnest(ARRAY['1548888-98.2025.8.07.7265', '8460758-40.202
 
 WITH ins AS (
   INSERT INTO denuncias (numero_protocolo, comarca, nome_comunicante, matricula_comunicante, oab_advogado, cpf_cnpj_parte, tipologia, tipologia_outros, relato, status, volume_processual_estimado, comarcas_atingidas, data_criacao, data_atualizacao)
-  VALUES ('LP-SEED-000036', 'Cajazeiras', 'Juíza Helena Nóbrega', 'MAT2110', 'PB23456', NULL, 'TESE_ARTIFICIAL_MASSA', NULL, 'Procurações com assinaturas visivelmente distintas das partes autoras.', 'EM_ANALISE_NUMOPED', 1101, 1, TIMESTAMP '2026-08-10 19:00:00', TIMESTAMP '2026-08-10 19:00:00')
+  VALUES ('LP-SEED-000036', 'Cajazeiras', 'Juíza Helena Nóbrega', 'MAT2110', 'PB23456', NULL, 'TESE_ARTIFICIAL_MASSA', NULL, 'Procurações com assinaturas visivelmente distintas das partes autoras.', 'EM_ANALISE_NUMOPED', 1101, 1, date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '1807 hours', date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '1807 hours')
   ON CONFLICT (numero_protocolo) DO NOTHING
   RETURNING id
 )
@@ -327,7 +327,7 @@ SELECT id, p FROM ins, unnest(ARRAY['5651899-28.2024.8.18.4107', '3927575-24.202
 
 WITH ins AS (
   INSERT INTO denuncias (numero_protocolo, comarca, nome_comunicante, matricula_comunicante, oab_advogado, cpf_cnpj_parte, tipologia, tipologia_outros, relato, status, volume_processual_estimado, comarcas_atingidas, data_criacao, data_atualizacao)
-  VALUES ('LP-SEED-000037', 'Cajazeiras', 'Juiz André Barbosa', 'MAT2033', 'PB51739', '80274422288', 'CAPTACAO_ILICITA_CLIENTELA', NULL, 'Comprovantes de residência reciclados identificados em múltiplos processos.', 'AGUARDANDO_NOTA_TECNICA', 531, 5, TIMESTAMP '2026-07-25 22:00:00', TIMESTAMP '2026-07-25 22:00:00')
+  VALUES ('LP-SEED-000037', 'Cajazeiras', 'Juiz André Barbosa', 'MAT2033', 'PB51739', '80274422288', 'CAPTACAO_ILICITA_CLIENTELA', NULL, 'Comprovantes de residência reciclados identificados em múltiplos processos.', 'AGUARDANDO_NOTA_TECNICA', 531, 5, date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '1451 hours', date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '1451 hours')
   ON CONFLICT (numero_protocolo) DO NOTHING
   RETURNING id
 )
@@ -336,7 +336,7 @@ SELECT id, p FROM ins, unnest(ARRAY['9748499-48.2025.8.01.0997', '9035982-61.202
 
 WITH ins AS (
   INSERT INTO denuncias (numero_protocolo, comarca, nome_comunicante, matricula_comunicante, oab_advogado, cpf_cnpj_parte, tipologia, tipologia_outros, relato, status, volume_processual_estimado, comarcas_atingidas, data_criacao, data_atualizacao)
-  VALUES ('LP-SEED-000038', 'Cuité', 'Juíza Camila Duarte', 'MAT2299', 'PB34567', '68434863125', 'FALSIFICACAO_DOCUMENTO', NULL, 'Comprovantes de residência reciclados identificados em múltiplos processos.', 'EM_PROVIDENCIA_CORREGEDORIA', 260, 10, TIMESTAMP '2026-07-27 07:00:00', TIMESTAMP '2026-07-27 07:00:00')
+  VALUES ('LP-SEED-000038', 'Cuité', 'Juíza Camila Duarte', 'MAT2299', 'PB34567', '68434863125', 'FALSIFICACAO_DOCUMENTO', NULL, 'Comprovantes de residência reciclados identificados em múltiplos processos.', 'EM_PROVIDENCIA_CORREGEDORIA', 260, 10, date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '1482 hours', date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '1482 hours')
   ON CONFLICT (numero_protocolo) DO NOTHING
   RETURNING id
 )
@@ -345,7 +345,7 @@ SELECT id, p FROM ins, unnest(ARRAY['8575834-39.2025.8.11.7431', '7689582-63.202
 
 WITH ins AS (
   INSERT INTO denuncias (numero_protocolo, comarca, nome_comunicante, matricula_comunicante, oab_advogado, cpf_cnpj_parte, tipologia, tipologia_outros, relato, status, volume_processual_estimado, comarcas_atingidas, data_criacao, data_atualizacao)
-  VALUES ('LP-SEED-000039', 'Princesa Isabel', 'Juíza Camila Duarte', 'MAT2299', 'PB55697', '69057021183', 'TESE_ARTIFICIAL_MASSA', NULL, 'Petições iniciais com texto quase idêntico, mudando apenas nome da parte.', 'EM_PROVIDENCIA_CORREGEDORIA', 1110, 1, TIMESTAMP '2026-08-09 05:00:00', TIMESTAMP '2026-08-09 05:00:00')
+  VALUES ('LP-SEED-000039', 'Princesa Isabel', 'Juíza Camila Duarte', 'MAT2299', 'PB55697', '69057021183', 'TESE_ARTIFICIAL_MASSA', NULL, 'Petições iniciais com texto quase idêntico, mudando apenas nome da parte.', 'EM_PROVIDENCIA_CORREGEDORIA', 1110, 1, date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '1771 hours', date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '1771 hours')
   ON CONFLICT (numero_protocolo) DO NOTHING
   RETURNING id
 )
@@ -354,7 +354,7 @@ SELECT id, p FROM ins, unnest(ARRAY['6899644-23.2026.8.17.3486', '3595941-94.202
 
 WITH ins AS (
   INSERT INTO denuncias (numero_protocolo, comarca, nome_comunicante, matricula_comunicante, oab_advogado, cpf_cnpj_parte, tipologia, tipologia_outros, relato, status, volume_processual_estimado, comarcas_atingidas, data_criacao, data_atualizacao)
-  VALUES ('LP-SEED-000040', 'Guarabira', 'Juiz Ricardo Farias', 'MAT1875', 'PB56717', NULL, 'FATIAMENTO_PEDIDOS', NULL, 'Procurações com assinaturas visivelmente distintas das partes autoras.', 'EM_ANALISE_NUMOPED', 1711, 5, TIMESTAMP '2026-05-27 10:00:00', TIMESTAMP '2026-05-27 10:00:00')
+  VALUES ('LP-SEED-000040', 'Guarabira', 'Juiz Ricardo Farias', 'MAT1875', 'PB56717', NULL, 'FATIAMENTO_PEDIDOS', NULL, 'Procurações com assinaturas visivelmente distintas das partes autoras.', 'EM_ANALISE_NUMOPED', 1711, 5, date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '118 hours', date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '118 hours')
   ON CONFLICT (numero_protocolo) DO NOTHING
   RETURNING id
 )
@@ -363,7 +363,7 @@ SELECT id, p FROM ins, unnest(ARRAY['2167449-28.2026.8.01.1504', '9900022-37.202
 
 WITH ins AS (
   INSERT INTO denuncias (numero_protocolo, comarca, nome_comunicante, matricula_comunicante, oab_advogado, cpf_cnpj_parte, tipologia, tipologia_outros, relato, status, volume_processual_estimado, comarcas_atingidas, data_criacao, data_atualizacao)
-  VALUES ('LP-SEED-000041', 'Santa Rita', 'Juíza Renata Sales', 'MAT1987', 'PB12345', '90223487600', 'CAPTACAO_ILICITA_CLIENTELA', NULL, 'Todos os comprovantes de energia têm a mesma data de vencimento e tipografia alterada.', 'EM_PROVIDENCIA_CORREGEDORIA', 1572, 9, TIMESTAMP '2026-07-21 20:00:00', TIMESTAMP '2026-07-21 20:00:00')
+  VALUES ('LP-SEED-000041', 'Santa Rita', 'Juíza Renata Sales', 'MAT1987', 'PB12345', '90223487600', 'CAPTACAO_ILICITA_CLIENTELA', NULL, 'Todos os comprovantes de energia têm a mesma data de vencimento e tipografia alterada.', 'EM_PROVIDENCIA_CORREGEDORIA', 1572, 9, date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '1360 hours', date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '1360 hours')
   ON CONFLICT (numero_protocolo) DO NOTHING
   RETURNING id
 )
@@ -372,7 +372,7 @@ SELECT id, p FROM ins, unnest(ARRAY['7631419-86.2024.8.01.3350', '6056977-37.202
 
 WITH ins AS (
   INSERT INTO denuncias (numero_protocolo, comarca, nome_comunicante, matricula_comunicante, oab_advogado, cpf_cnpj_parte, tipologia, tipologia_outros, relato, status, volume_processual_estimado, comarcas_atingidas, data_criacao, data_atualizacao)
-  VALUES ('LP-SEED-000042', 'Bayeux', 'Juíza Camila Duarte', 'MAT2299', 'PB12345', '88653996486', 'FATIAMENTO_PEDIDOS', NULL, 'Fracionamento de pedidos para burlar o rito dos juizados especiais.', 'AGUARDANDO_NOTA_TECNICA', 703, 2, TIMESTAMP '2026-07-15 14:00:00', TIMESTAMP '2026-07-15 14:00:00')
+  VALUES ('LP-SEED-000042', 'Bayeux', 'Juíza Camila Duarte', 'MAT2299', 'PB12345', '88653996486', 'FATIAMENTO_PEDIDOS', NULL, 'Fracionamento de pedidos para burlar o rito dos juizados especiais.', 'AGUARDANDO_NOTA_TECNICA', 703, 2, date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '1220 hours', date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '1220 hours')
   ON CONFLICT (numero_protocolo) DO NOTHING
   RETURNING id
 )
@@ -381,7 +381,7 @@ SELECT id, p FROM ins, unnest(ARRAY['2932288-61.2024.8.11.2816', '8719145-98.202
 
 WITH ins AS (
   INSERT INTO denuncias (numero_protocolo, comarca, nome_comunicante, matricula_comunicante, oab_advogado, cpf_cnpj_parte, tipologia, tipologia_outros, relato, status, volume_processual_estimado, comarcas_atingidas, data_criacao, data_atualizacao)
-  VALUES ('LP-SEED-000043', 'Solânea', 'Juíza Renata Sales', 'MAT1987', 'PB64628', NULL, 'FATIAMENTO_PEDIDOS', NULL, 'Procurações com assinaturas visivelmente distintas das partes autoras.', 'EM_PROVIDENCIA_CORREGEDORIA', 1338, 14, TIMESTAMP '2026-05-22 04:00:00', TIMESTAMP '2026-05-22 04:00:00')
+  VALUES ('LP-SEED-000043', 'Solânea', 'Juíza Renata Sales', 'MAT1987', 'PB64628', NULL, 'FATIAMENTO_PEDIDOS', NULL, 'Procurações com assinaturas visivelmente distintas das partes autoras.', 'EM_PROVIDENCIA_CORREGEDORIA', 1338, 14, date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '0 hours', date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '0 hours')
   ON CONFLICT (numero_protocolo) DO NOTHING
   RETURNING id
 )
@@ -390,7 +390,7 @@ SELECT id, p FROM ins, unnest(ARRAY['2724773-28.2025.8.07.2843', '3564729-93.202
 
 WITH ins AS (
   INSERT INTO denuncias (numero_protocolo, comarca, nome_comunicante, matricula_comunicante, oab_advogado, cpf_cnpj_parte, tipologia, tipologia_outros, relato, status, volume_processual_estimado, comarcas_atingidas, data_criacao, data_atualizacao)
-  VALUES ('LP-SEED-000044', 'Catolé do Rocha', 'Juiz Fábio Cavalcanti', 'MAT2054', 'PB77651', '88489125735', 'FALSIFICACAO_DOCUMENTO', NULL, 'Petições iniciais com texto quase idêntico, mudando apenas nome da parte.', 'AGUARDANDO_NOTA_TECNICA', 360, 9, TIMESTAMP '2026-07-30 14:00:00', TIMESTAMP '2026-07-30 14:00:00')
+  VALUES ('LP-SEED-000044', 'Catolé do Rocha', 'Juiz Fábio Cavalcanti', 'MAT2054', 'PB77651', '88489125735', 'FALSIFICACAO_DOCUMENTO', NULL, 'Petições iniciais com texto quase idêntico, mudando apenas nome da parte.', 'AGUARDANDO_NOTA_TECNICA', 360, 9, date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '1556 hours', date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '1556 hours')
   ON CONFLICT (numero_protocolo) DO NOTHING
   RETURNING id
 )
@@ -399,7 +399,7 @@ SELECT id, p FROM ins, unnest(ARRAY['8581856-14.2024.8.12.4704', '2287332-92.202
 
 WITH ins AS (
   INSERT INTO denuncias (numero_protocolo, comarca, nome_comunicante, matricula_comunicante, oab_advogado, cpf_cnpj_parte, tipologia, tipologia_outros, relato, status, volume_processual_estimado, comarcas_atingidas, data_criacao, data_atualizacao)
-  VALUES ('LP-SEED-000045', 'Guarabira', 'Juiz Marcos Andrade', 'MAT2201', 'PB45678', NULL, 'CAPTACAO_ILICITA_CLIENTELA', NULL, 'Parte autora afirma desconhecer a ação distribuída em seu nome.', 'EM_PROVIDENCIA_CORREGEDORIA', 594, 15, TIMESTAMP '2026-08-02 06:00:00', TIMESTAMP '2026-08-02 06:00:00')
+  VALUES ('LP-SEED-000045', 'Guarabira', 'Juiz Marcos Andrade', 'MAT2201', 'PB45678', NULL, 'CAPTACAO_ILICITA_CLIENTELA', NULL, 'Parte autora afirma desconhecer a ação distribuída em seu nome.', 'EM_PROVIDENCIA_CORREGEDORIA', 594, 15, date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '1615 hours', date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '1615 hours')
   ON CONFLICT (numero_protocolo) DO NOTHING
   RETURNING id
 )
@@ -408,7 +408,7 @@ SELECT id, p FROM ins, unnest(ARRAY['5746166-59.2025.8.11.9796', '1878547-90.202
 
 WITH ins AS (
   INSERT INTO denuncias (numero_protocolo, comarca, nome_comunicante, matricula_comunicante, oab_advogado, cpf_cnpj_parte, tipologia, tipologia_outros, relato, status, volume_processual_estimado, comarcas_atingidas, data_criacao, data_atualizacao)
-  VALUES ('LP-SEED-000046', 'Pombal', 'Juiz Ricardo Farias', 'MAT1875', 'PB89453', NULL, 'FALSIFICACAO_DOCUMENTO', NULL, 'Mesmo advogado ajuizou dezenas de ações idênticas de consignado em poucos dias.', 'EM_PROVIDENCIA_CORREGEDORIA', 331, 5, TIMESTAMP '2026-07-26 20:00:00', TIMESTAMP '2026-07-26 20:00:00')
+  VALUES ('LP-SEED-000046', 'Pombal', 'Juiz Ricardo Farias', 'MAT1875', 'PB89453', NULL, 'FALSIFICACAO_DOCUMENTO', NULL, 'Mesmo advogado ajuizou dezenas de ações idênticas de consignado em poucos dias.', 'EM_PROVIDENCIA_CORREGEDORIA', 331, 5, date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '1472 hours', date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '1472 hours')
   ON CONFLICT (numero_protocolo) DO NOTHING
   RETURNING id
 )
@@ -417,7 +417,7 @@ SELECT id, p FROM ins, unnest(ARRAY['7319630-92.2025.8.05.8625', '2567880-92.202
 
 WITH ins AS (
   INSERT INTO denuncias (numero_protocolo, comarca, nome_comunicante, matricula_comunicante, oab_advogado, cpf_cnpj_parte, tipologia, tipologia_outros, relato, status, volume_processual_estimado, comarcas_atingidas, data_criacao, data_atualizacao)
-  VALUES ('LP-SEED-000047', 'Sousa', 'Juiz Marcos Andrade', 'MAT2201', 'PB95962', NULL, 'FALSIFICACAO_DOCUMENTO', NULL, 'Procurações com assinaturas visivelmente distintas das partes autoras.', 'EM_ANALISE_NUMOPED', 2351, 8, TIMESTAMP '2026-07-19 13:00:00', TIMESTAMP '2026-07-19 13:00:00')
+  VALUES ('LP-SEED-000047', 'Sousa', 'Juiz Marcos Andrade', 'MAT2201', 'PB95962', NULL, 'FALSIFICACAO_DOCUMENTO', NULL, 'Procurações com assinaturas visivelmente distintas das partes autoras.', 'EM_ANALISE_NUMOPED', 2351, 8, date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '1308 hours', date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '1308 hours')
   ON CONFLICT (numero_protocolo) DO NOTHING
   RETURNING id
 )
@@ -426,7 +426,7 @@ SELECT id, p FROM ins, unnest(ARRAY['3777286-66.2024.8.14.5969', '4985095-66.202
 
 WITH ins AS (
   INSERT INTO denuncias (numero_protocolo, comarca, nome_comunicante, matricula_comunicante, oab_advogado, cpf_cnpj_parte, tipologia, tipologia_outros, relato, status, volume_processual_estimado, comarcas_atingidas, data_criacao, data_atualizacao)
-  VALUES ('LP-SEED-000048', 'Itaporanga', 'Juiz Ricardo Farias', 'MAT1875', 'PB52082', NULL, 'OUTROS', 'Reciclagem de laudos periciais adulterados', 'Procurações com assinaturas visivelmente distintas das partes autoras.', 'EM_PROVIDENCIA_CORREGEDORIA', 233, 7, TIMESTAMP '2026-08-09 11:00:00', TIMESTAMP '2026-08-09 11:00:00')
+  VALUES ('LP-SEED-000048', 'Itaporanga', 'Juiz Ricardo Farias', 'MAT1875', 'PB52082', NULL, 'OUTROS', 'Reciclagem de laudos periciais adulterados', 'Procurações com assinaturas visivelmente distintas das partes autoras.', 'EM_PROVIDENCIA_CORREGEDORIA', 233, 7, date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '1777 hours', date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '1777 hours')
   ON CONFLICT (numero_protocolo) DO NOTHING
   RETURNING id
 )
@@ -435,7 +435,7 @@ SELECT id, p FROM ins, unnest(ARRAY['1875431-92.2025.8.12.9086', '2721170-76.202
 
 WITH ins AS (
   INSERT INTO denuncias (numero_protocolo, comarca, nome_comunicante, matricula_comunicante, oab_advogado, cpf_cnpj_parte, tipologia, tipologia_outros, relato, status, volume_processual_estimado, comarcas_atingidas, data_criacao, data_atualizacao)
-  VALUES ('LP-SEED-000049', 'Solânea', 'Juíza Camila Duarte', 'MAT2299', 'PB12345', '53070737542', 'TESE_ARTIFICIAL_MASSA', NULL, 'Parte autora afirma desconhecer a ação distribuída em seu nome.', 'EM_PROVIDENCIA_CORREGEDORIA', 1748, 2, TIMESTAMP '2026-05-27 08:00:00', TIMESTAMP '2026-05-27 08:00:00')
+  VALUES ('LP-SEED-000049', 'Solânea', 'Juíza Camila Duarte', 'MAT2299', 'PB12345', '53070737542', 'TESE_ARTIFICIAL_MASSA', NULL, 'Parte autora afirma desconhecer a ação distribuída em seu nome.', 'EM_PROVIDENCIA_CORREGEDORIA', 1748, 2, date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '116 hours', date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '116 hours')
   ON CONFLICT (numero_protocolo) DO NOTHING
   RETURNING id
 )
@@ -444,7 +444,7 @@ SELECT id, p FROM ins, unnest(ARRAY['3308538-14.2025.8.16.2274', '8870361-67.202
 
 WITH ins AS (
   INSERT INTO denuncias (numero_protocolo, comarca, nome_comunicante, matricula_comunicante, oab_advogado, cpf_cnpj_parte, tipologia, tipologia_outros, relato, status, volume_processual_estimado, comarcas_atingidas, data_criacao, data_atualizacao)
-  VALUES ('LP-SEED-000050', 'Monteiro', 'Juíza Helena Nóbrega', 'MAT2110', 'PB12345', '72804493160', 'FALSIFICACAO_DOCUMENTO', NULL, 'Advogado de outro estado concentrando dezenas de ações na mesma vara.', 'EM_PROVIDENCIA_CORREGEDORIA', 2169, 9, TIMESTAMP '2026-06-27 22:00:00', TIMESTAMP '2026-06-27 22:00:00')
+  VALUES ('LP-SEED-000050', 'Monteiro', 'Juíza Helena Nóbrega', 'MAT2110', 'PB12345', '72804493160', 'FALSIFICACAO_DOCUMENTO', NULL, 'Advogado de outro estado concentrando dezenas de ações na mesma vara.', 'EM_PROVIDENCIA_CORREGEDORIA', 2169, 9, date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '824 hours', date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '824 hours')
   ON CONFLICT (numero_protocolo) DO NOTHING
   RETURNING id
 )
@@ -453,7 +453,7 @@ SELECT id, p FROM ins, unnest(ARRAY['9646569-83.2024.8.05.4773', '8201433-10.202
 
 WITH ins AS (
   INSERT INTO denuncias (numero_protocolo, comarca, nome_comunicante, matricula_comunicante, oab_advogado, cpf_cnpj_parte, tipologia, tipologia_outros, relato, status, volume_processual_estimado, comarcas_atingidas, data_criacao, data_atualizacao)
-  VALUES ('LP-SEED-000051', 'Solânea', 'Juiz Marcos Andrade', 'MAT2201', 'PB45678', '45963059926', 'ACAO_SEM_CONSENTIMENTO', NULL, 'Mesmo advogado ajuizou dezenas de ações idênticas de consignado em poucos dias.', 'EM_ANALISE_NUMOPED', 194, 13, TIMESTAMP '2026-07-06 18:00:00', TIMESTAMP '2026-07-06 18:00:00')
+  VALUES ('LP-SEED-000051', 'Solânea', 'Juiz Marcos Andrade', 'MAT2201', 'PB45678', '45963059926', 'ACAO_SEM_CONSENTIMENTO', NULL, 'Mesmo advogado ajuizou dezenas de ações idênticas de consignado em poucos dias.', 'EM_ANALISE_NUMOPED', 194, 13, date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '1022 hours', date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '1022 hours')
   ON CONFLICT (numero_protocolo) DO NOTHING
   RETURNING id
 )
@@ -462,7 +462,7 @@ SELECT id, p FROM ins, unnest(ARRAY['5045421-94.2026.8.04.9534', '6578736-27.202
 
 WITH ins AS (
   INSERT INTO denuncias (numero_protocolo, comarca, nome_comunicante, matricula_comunicante, oab_advogado, cpf_cnpj_parte, tipologia, tipologia_outros, relato, status, volume_processual_estimado, comarcas_atingidas, data_criacao, data_atualizacao)
-  VALUES ('LP-SEED-000052', 'Santa Rita', 'Juiz Marcos Andrade', 'MAT2201', 'PB34567', NULL, 'OUTROS', 'Reciclagem de laudos periciais adulterados', 'Petições iniciais com texto quase idêntico, mudando apenas nome da parte.', 'AGUARDANDO_NOTA_TECNICA', 2141, 5, TIMESTAMP '2026-06-10 13:00:00', TIMESTAMP '2026-06-10 13:00:00')
+  VALUES ('LP-SEED-000052', 'Santa Rita', 'Juiz Marcos Andrade', 'MAT2201', 'PB34567', NULL, 'OUTROS', 'Reciclagem de laudos periciais adulterados', 'Petições iniciais com texto quase idêntico, mudando apenas nome da parte.', 'AGUARDANDO_NOTA_TECNICA', 2141, 5, date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '434 hours', date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '434 hours')
   ON CONFLICT (numero_protocolo) DO NOTHING
   RETURNING id
 )
@@ -471,7 +471,7 @@ SELECT id, p FROM ins, unnest(ARRAY['4206183-46.2025.8.02.5439', '5583814-25.202
 
 WITH ins AS (
   INSERT INTO denuncias (numero_protocolo, comarca, nome_comunicante, matricula_comunicante, oab_advogado, cpf_cnpj_parte, tipologia, tipologia_outros, relato, status, volume_processual_estimado, comarcas_atingidas, data_criacao, data_atualizacao)
-  VALUES ('LP-SEED-000053', 'Patos', 'Juiz André Barbosa', 'MAT2033', 'PB23456', NULL, 'FATIAMENTO_PEDIDOS', NULL, 'Petições iniciais com texto quase idêntico, mudando apenas nome da parte.', 'NOVO', NULL, NULL, TIMESTAMP '2026-07-25 05:00:00', TIMESTAMP '2026-07-25 05:00:00')
+  VALUES ('LP-SEED-000053', 'Patos', 'Juiz André Barbosa', 'MAT2033', 'PB23456', NULL, 'FATIAMENTO_PEDIDOS', NULL, 'Petições iniciais com texto quase idêntico, mudando apenas nome da parte.', 'NOVO', NULL, NULL, date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '1435 hours', date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '1435 hours')
   ON CONFLICT (numero_protocolo) DO NOTHING
   RETURNING id
 )
@@ -480,7 +480,7 @@ SELECT id, p FROM ins, unnest(ARRAY['8481225-87.2026.8.14.2731', '8447546-54.202
 
 WITH ins AS (
   INSERT INTO denuncias (numero_protocolo, comarca, nome_comunicante, matricula_comunicante, oab_advogado, cpf_cnpj_parte, tipologia, tipologia_outros, relato, status, volume_processual_estimado, comarcas_atingidas, data_criacao, data_atualizacao)
-  VALUES ('LP-SEED-000054', 'Itaporanga', 'Juiz Marcos Andrade', 'MAT2201', 'PB23456', NULL, 'FATIAMENTO_PEDIDOS', NULL, 'Todos os comprovantes de energia têm a mesma data de vencimento e tipografia alterada.', 'EM_ANALISE_NUMOPED', 1600, 15, TIMESTAMP '2026-06-10 08:00:00', TIMESTAMP '2026-06-10 08:00:00')
+  VALUES ('LP-SEED-000054', 'Itaporanga', 'Juiz Marcos Andrade', 'MAT2201', 'PB23456', NULL, 'FATIAMENTO_PEDIDOS', NULL, 'Todos os comprovantes de energia têm a mesma data de vencimento e tipografia alterada.', 'EM_ANALISE_NUMOPED', 1600, 15, date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '430 hours', date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '430 hours')
   ON CONFLICT (numero_protocolo) DO NOTHING
   RETURNING id
 )
@@ -489,7 +489,7 @@ SELECT id, p FROM ins, unnest(ARRAY['8548448-57.2025.8.15.1260', '3310140-77.202
 
 WITH ins AS (
   INSERT INTO denuncias (numero_protocolo, comarca, nome_comunicante, matricula_comunicante, oab_advogado, cpf_cnpj_parte, tipologia, tipologia_outros, relato, status, volume_processual_estimado, comarcas_atingidas, data_criacao, data_atualizacao)
-  VALUES ('LP-SEED-000055', 'Princesa Isabel', 'Juíza Renata Sales', 'MAT1987', 'PB34567', NULL, 'FALSIFICACAO_DOCUMENTO', NULL, 'Advogado de outro estado concentrando dezenas de ações na mesma vara.', 'EM_PROVIDENCIA_CORREGEDORIA', 728, 13, TIMESTAMP '2026-07-23 02:00:00', TIMESTAMP '2026-07-23 02:00:00')
+  VALUES ('LP-SEED-000055', 'Princesa Isabel', 'Juíza Renata Sales', 'MAT1987', 'PB34567', NULL, 'FALSIFICACAO_DOCUMENTO', NULL, 'Advogado de outro estado concentrando dezenas de ações na mesma vara.', 'EM_PROVIDENCIA_CORREGEDORIA', 728, 13, date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '1388 hours', date_trunc('week', CURRENT_TIMESTAMP AT TIME ZONE 'America/Recife') - INTERVAL '11 weeks' + INTERVAL '1388 hours')
   ON CONFLICT (numero_protocolo) DO NOTHING
   RETURNING id
 )
