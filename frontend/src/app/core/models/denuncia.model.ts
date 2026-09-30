@@ -57,6 +57,7 @@ export interface DenunciaResponse {
   id: number;
   versao: number;
   historico: HistoricoItem[];
+  documentos: DocumentoInfo[];
   numeroProtocolo: string;
   comarca: string;
   nomeComunicante: string;
@@ -88,6 +89,8 @@ export interface HistoricoItem {
   comarcas: number | null;
   nota: string | null;
 }
+
+export interface DocumentoInfo { id: string; nome: string; tamanho: number; }
 
 export interface PaginaDenuncias {
   itens: DenunciaResponse[];

@@ -63,7 +63,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   private saveRequest?: Subscription;
   private focoAnterior?: HTMLElement;
 
-  constructor(private dashboardService: DashboardService, private denunciaService: DenunciaService) {}
+  constructor(private dashboardService: DashboardService, public denunciaService: DenunciaService) {}
 
   ngOnInit(): void {
     this.carregar();

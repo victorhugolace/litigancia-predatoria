@@ -179,6 +179,12 @@
       <h3>Nota técnica</h3>
       <p>{{ d.notaTecnicaResumo }}</p>
     </div>
+    <section class="drilldown__section" *ngIf="d.documentos.length || d.anexos.length">
+      <h3>Documentos comprobatórios</h3>
+      <ul><li *ngFor="let documento of d.documentos">
+        <a [href]="denunciaService.urlDocumento(d.id, documento.id)" download>{{ documento.nome }} · {{ (documento.tamanho / 1024) | number:'1.0-0' }} KB</a>
+      </li><li *ngFor="let legado of d.anexos">{{ legado }} — registro legado sem arquivo disponível</li></ul>
+    </section>
     <p *ngIf="carregandoDetalhe()">Carregando detalhes…</p>
     <div *ngIf="erroDetalhe()" class="dash__erro" role="alert">
       <p>{{ erroDetalhe() }}</p><button class="lp-btn lp-btn--ghost" (click)="recarregarDetalhe()">Recarregar caso</button>

@@ -10,8 +10,18 @@ export class DenunciaService {
 
   constructor(private http: HttpClient) {}
 
-  criar(request: DenunciaRequest): Observable<DenunciaResponse> {
+  criar(request: DenunciaRequest, arquivos: File[] = []): Observable<DenunciaResponse> {
+    if (arquivos.length) {
+      const form = new FormData();
+      form.append('dados', new Blob([JSON.stringify(request)], { type: 'application/json' }));
+      arquivos.forEach(arquivo => form.append('arquivos', arquivo, arquivo.name));
+      return this.http.post<DenunciaResponse>(this.baseUrl, form);
+    }
     return this.http.post<DenunciaResponse>(this.baseUrl, request);
+  }
+
+  urlDocumento(denunciaId: number, documentoId: string): string {
+    return `${this.baseUrl}/${denunciaId}/documentos/${documentoId}`;
   }
 
   listar(status?: StatusDenuncia, pagina = 0, tamanho = 25): Observable<PaginaDenuncias> {

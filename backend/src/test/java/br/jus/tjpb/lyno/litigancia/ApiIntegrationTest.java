@@ -137,4 +137,34 @@ class ApiIntegrationTest {
         mvc.perform(get("/api/denuncias").param("tamanho", "101")).andExpect(status().isBadRequest());
         mvc.perform(get("/api/denuncias").param("pagina", "-1")).andExpect(status().isBadRequest());
     }
+
+    @Test
+    void salvaPdfEBaixaConteudoSemPermitirTrocaDaDenuncia() throws Exception {
+        byte[] pdf = "%PDF-1.4\nDocumento de teste\n%%EOF".getBytes(java.nio.charset.StandardCharsets.UTF_8);
+        var dados = new org.springframework.mock.web.MockMultipartFile("dados", "", "application/json", dadosValidos().getBytes(java.nio.charset.StandardCharsets.UTF_8));
+        var arquivo = new org.springframework.mock.web.MockMultipartFile("arquivos", "../../laudo.pdf", "application/pdf", pdf);
+        var response = mvc.perform(multipart("/api/denuncias").file(dados).file(arquivo))
+                .andExpect(status().isCreated()).andExpect(jsonPath("$.documentos[0].nome").value("laudo.pdf"))
+                .andReturn().getResponse().getContentAsString();
+        var tree = mapper.readTree(response);
+        long id = tree.get("id").asLong();
+        String documento = tree.get("documentos").get(0).get("id").asText();
+        mvc.perform(get("/api/denuncias/" + id + "/documentos/" + documento))
+                .andExpect(status().isOk()).andExpect(content().bytes(pdf))
+                .andExpect(header().string("Cache-Control", "no-store"));
+        mvc.perform(get("/api/denuncias/" + (id + 1) + "/documentos/" + documento))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void rejeitaAnexosInvalidosSemCriarDenunciaParcial() throws Exception {
+        var dados = new org.springframework.mock.web.MockMultipartFile("dados", "", "application/json", dadosValidos().getBytes(java.nio.charset.StandardCharsets.UTF_8));
+        var falso = new org.springframework.mock.web.MockMultipartFile("arquivos", "falso.pdf", "application/pdf", "nao e PDF".getBytes());
+        mvc.perform(multipart("/api/denuncias").file(dados).file(falso)).andExpect(status().isBadRequest());
+        var grande = new org.springframework.mock.web.MockMultipartFile("arquivos", "grande.pdf", "application/pdf", new byte[10 * 1024 * 1024 + 1]);
+        mvc.perform(multipart("/api/denuncias").file(dados).file(grande)).andExpect(status().isBadRequest());
+        mvc.perform(post("/api/denuncias").contentType("application/json").content(dadosValidos().replace("\"anexos\":[]", "\"anexos\":[\"perdido.pdf\"]")))
+                .andExpect(status().isBadRequest());
+        assertThat(repository.count()).isZero();
+    }
 }

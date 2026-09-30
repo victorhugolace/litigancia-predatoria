@@ -11,6 +11,7 @@ public class DenunciaResponse {
     private Long id;
     private Long versao;
     private List<br.jus.tjpb.lyno.litigancia.model.Historico> historico = List.of();
+    private List<DocumentoInfo> documentos = List.of();
     private String numeroProtocolo;
     private String comarca;
     private String nomeComunicante;
@@ -63,6 +64,8 @@ public class DenunciaResponse {
     public Long getVersao() { return versao; }
     public List<br.jus.tjpb.lyno.litigancia.model.Historico> getHistorico() { return historico; }
     public void setHistorico(List<br.jus.tjpb.lyno.litigancia.model.Historico> historico) { this.historico = historico; }
+    public List<DocumentoInfo> getDocumentos() { return documentos; }
+    public void setDocumentos(List<DocumentoInfo> documentos) { this.documentos = documentos; }
     public String getNumeroProtocolo() { return numeroProtocolo; }
     public String getComarca() { return comarca; }
     public String getNomeComunicante() { return nomeComunicante; }

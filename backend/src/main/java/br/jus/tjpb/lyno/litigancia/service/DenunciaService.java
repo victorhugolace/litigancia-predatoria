@@ -27,12 +27,25 @@ public class DenunciaService {
     private final DenunciaRepository repository;
     private final Clock clock;
     private final br.jus.tjpb.lyno.litigancia.repository.HistoricoRepository historicoRepository;
+    private final DocumentoService documentoService;
+    private final br.jus.tjpb.lyno.litigancia.repository.DocumentoRepository documentoRepository;
 
     public DenunciaService(DenunciaRepository repository, Clock clock,
-                          br.jus.tjpb.lyno.litigancia.repository.HistoricoRepository historicoRepository) {
+                          br.jus.tjpb.lyno.litigancia.repository.HistoricoRepository historicoRepository,
+                          DocumentoService documentoService, br.jus.tjpb.lyno.litigancia.repository.DocumentoRepository documentoRepository) {
         this.repository = repository;
         this.clock = clock;
         this.historicoRepository = historicoRepository;
+        this.documentoService = documentoService;
+        this.documentoRepository = documentoRepository;
+    }
+
+    @Transactional
+    public DenunciaResponse criarComDocumentos(DenunciaRequest request, org.springframework.web.multipart.MultipartFile[] arquivos) {
+        var validados = documentoService.validar(arquivos);
+        var response = criar(request);
+        documentoService.salvar(response.getId(), validados);
+        return buscar(response.getId());
     }
 
     @Transactional
@@ -76,6 +89,7 @@ public class DenunciaService {
                 .orElseThrow(() -> new EntityNotFoundException("Denúncia não encontrada: " + id));
         var response = DenunciaResponse.from(d);
         response.setHistorico(historicoRepository.findByDenunciaIdOrderByIdDesc(id));
+        response.setDocumentos(documentoRepository.listarMetadados(id));
         return response;
     }
 

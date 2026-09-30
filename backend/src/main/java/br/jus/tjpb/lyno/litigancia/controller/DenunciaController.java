@@ -17,15 +17,32 @@ import java.util.List;
 public class DenunciaController {
 
     private final DenunciaService service;
+    private final br.jus.tjpb.lyno.litigancia.service.DocumentoService documentoService;
 
-    public DenunciaController(DenunciaService service) {
+    public DenunciaController(DenunciaService service, br.jus.tjpb.lyno.litigancia.service.DocumentoService documentoService) {
         this.service = service;
+        this.documentoService = documentoService;
     }
 
-    @PostMapping
+    @PostMapping(consumes = "application/json")
     public ResponseEntity<DenunciaResponse> criar(@Valid @RequestBody DenunciaRequest request) {
         DenunciaResponse response = service.criar(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @PostMapping(consumes = "multipart/form-data")
+    public ResponseEntity<DenunciaResponse> criarComDocumentos(@Valid @RequestPart("dados") DenunciaRequest request,
+            @RequestPart(value = "arquivos", required = false) org.springframework.web.multipart.MultipartFile[] arquivos) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.criarComDocumentos(request, arquivos));
+    }
+
+    @GetMapping("/{id}/documentos/{documentoId}")
+    public ResponseEntity<byte[]> baixarDocumento(@PathVariable Long id, @PathVariable java.util.UUID documentoId) {
+        var documento = documentoService.buscar(id, documentoId);
+        return ResponseEntity.ok().contentType(org.springframework.http.MediaType.APPLICATION_PDF)
+                .header("Content-Disposition", org.springframework.http.ContentDisposition.attachment().filename(documento.getNome(), java.nio.charset.StandardCharsets.UTF_8).build().toString())
+                .header("X-Content-Type-Options", "nosniff")
+                .cacheControl(org.springframework.http.CacheControl.noStore()).body(documento.getConteudo());
     }
 
     @GetMapping

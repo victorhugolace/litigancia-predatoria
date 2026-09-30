@@ -141,6 +141,7 @@ export class DenunciaFormComponent {
   }
 
   arquivosAnexados = signal<File[]>([]);
+  erroArquivo = signal<string | null>(null);
   isDragging = signal(false);
 
   onFileSelected(event: Event): void {
@@ -174,6 +175,13 @@ export class DenunciaFormComponent {
 
   adicionarArquivos(novosArquivos: File[]): void {
     const atuais = this.arquivosAnexados();
+    this.erroArquivo.set(null);
+    if (atuais.length + novosArquivos.length > 5) {
+      this.erroArquivo.set('Selecione no máximo 5 PDFs.'); return;
+    }
+    if (novosArquivos.some(f => !f.name.toLowerCase().endsWith('.pdf') || f.size === 0 || f.size > 10 * 1024 * 1024)) {
+      this.erroArquivo.set('Os arquivos devem ser PDFs com conteúdo e no máximo 10 MB cada.'); return;
+    }
     this.arquivosAnexados.set([...atuais, ...novosArquivos]);
   }
 
@@ -212,8 +220,8 @@ export class DenunciaFormComponent {
       tipologiaOutros: valor.tipologiaOutros || undefined,
       processosParadigmas: valor.processosParadigmas,
       relato: valor.relato,
-      anexos: this.arquivosAnexados().map(f => f.name)
-    }).subscribe({
+      anexos: []
+    }, this.arquivosAnexados()).subscribe({
       next: resposta => {
         this.enviando.set(false);
         this.protocoloGerado.set(resposta.numeroProtocolo);
@@ -233,6 +241,7 @@ export class DenunciaFormComponent {
     this.currentStep.set(0);
     this.form.reset();
     this.arquivosAnexados.set([]);
+    this.erroArquivo.set(null);
     this.processosArray.clear();
     this.processosArray.push(this.novoProcesso());
     this.processosArray.push(this.novoProcesso());
