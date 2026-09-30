@@ -5,6 +5,7 @@ import br.jus.tjpb.lyno.litigancia.dto.DenunciaRequest;
 import br.jus.tjpb.lyno.litigancia.dto.DenunciaResponse;
 import br.jus.tjpb.lyno.litigancia.model.Denuncia;
 import br.jus.tjpb.lyno.litigancia.model.StatusDenuncia;
+import br.jus.tjpb.lyno.litigancia.model.Periodo;
 import br.jus.tjpb.lyno.litigancia.repository.DenunciaRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
@@ -12,6 +13,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.Clock;
+import java.time.LocalDate;
+import java.time.DayOfWeek;
+import java.time.temporal.TemporalAdjusters;
+import org.springframework.data.domain.PageRequest;
 import java.time.Year;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -42,6 +47,8 @@ public class DenunciaService {
         d.setAnexos(request.getAnexos() != null ? request.getAnexos() : List.of());
         d.setStatus(StatusDenuncia.NOVO);
         d.setNumeroProtocolo(gerarNumeroProtocolo());
+        d.setDataCriacao(LocalDateTime.now(clock));
+        d.setDataAtualizacao(d.getDataCriacao());
 
         Denuncia salvo = repository.save(d);
         return DenunciaResponse.from(salvo);
@@ -78,6 +85,7 @@ public class DenunciaService {
         if (request.notaTecnicaResumo != null) {
             d.setNotaTecnicaResumo(request.notaTecnicaResumo);
         }
+        d.setDataAtualizacao(LocalDateTime.now(clock));
         return DenunciaResponse.from(repository.save(d));
     }
 
@@ -89,26 +97,30 @@ public class DenunciaService {
     // --- Dashboard ---
 
     @Transactional(readOnly = true)
-    public KpisResponse kpis() {
+    public KpisResponse kpis(Periodo periodo) {
+        LocalDateTime desde = periodo.inicio(LocalDate.now(clock)), ate = LocalDateTime.now(clock);
         return new KpisResponse(
-                repository.countTotal(),
-                repository.somaVolumeProcessual(),
-                repository.countComarcasDistintas()
+                repository.countTotal(desde, ate),
+                repository.somaVolumeProcessual(desde, ate),
+                repository.countComarcasDistintas(desde, ate)
         );
     }
 
     @Transactional(readOnly = true)
-    public List<RankingItem> ranking() {
-        return repository.rankingReincidencia().stream()
-                .limit(10)
+    public List<RankingItem> ranking(Periodo periodo, boolean porDocumento) {
+        LocalDateTime desde = periodo.inicio(LocalDate.now(clock)), ate = LocalDateTime.now(clock);
+        var pagina = PageRequest.of(0, 10);
+        var dados = porDocumento ? repository.rankingDocumentos(desde, ate, pagina) : repository.rankingReincidencia(desde, ate, pagina);
+        return dados.stream()
                 .map(p -> new RankingItem(p.getChave(), p.getTotal(), p.getComarcas()))
                 .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
-    public List<TipologiaItem> distribuicaoTipologia() {
-        long total = repository.countTotal();
-        return repository.contagemPorTipologia().stream()
+    public List<TipologiaItem> distribuicaoTipologia(Periodo periodo) {
+        LocalDateTime desde = periodo.inicio(LocalDate.now(clock)), ate = LocalDateTime.now(clock);
+        long total = repository.countTotal(desde, ate);
+        return repository.contagemPorTipologia(desde, ate).stream()
                 .map(p -> new TipologiaItem(
                         p.getTipologia().name(),
                         p.getTipologia().getDescricao(),
@@ -119,17 +131,22 @@ public class DenunciaService {
     }
 
     @Transactional(readOnly = true)
-    public List<ComarcaItem> distribuicaoComarcas() {
-        return repository.contagemPorComarca().stream()
+    public List<ComarcaItem> distribuicaoComarcas(Periodo periodo) {
+        LocalDateTime desde = periodo.inicio(LocalDate.now(clock)), ate = LocalDateTime.now(clock);
+        return repository.contagemPorComarca(desde, ate).stream()
                 .map(p -> new ComarcaItem(p.getComarca(), p.getTotal()))
                 .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
-    public List<TendenciaItem> tendenciaSemanal() {
-        LocalDateTime desde = LocalDateTime.now().minusWeeks(12);
-        return repository.tendenciaSemanal(desde).stream()
-                .map(p -> new TendenciaItem(p.getSemana().toLocalDate(), p.getTotal()))
-                .collect(Collectors.toList());
+    public List<TendenciaItem> tendenciaSemanal(Periodo periodo) {
+        LocalDate inicio = LocalDate.now(clock).with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)).minusWeeks(11);
+        LocalDateTime desdePeriodo = periodo.inicio(LocalDate.now(clock));
+        LocalDateTime desde = desdePeriodo.isAfter(inicio.atStartOfDay()) ? desdePeriodo : inicio.atStartOfDay();
+        var contagens = repository.tendenciaSemanal(desde, LocalDateTime.now(clock)).stream()
+                .collect(Collectors.toMap(p -> p.getSemana().toLocalDate(), p -> p.getTotal()));
+        return java.util.stream.IntStream.range(0, 12)
+                .mapToObj(i -> new TendenciaItem(inicio.plusWeeks(i), contagens.getOrDefault(inicio.plusWeeks(i), 0L)))
+                .toList();
     }
 }

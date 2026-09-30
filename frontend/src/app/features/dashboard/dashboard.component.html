@@ -4,21 +4,33 @@
     <span class="dash__eyebrow">Centro de Inteligência</span>
     <h1>Painel de Litigância Predatória</h1>
     <p class="dash__lede">
-      Se você abrisse o computador nesta segunda-feira, qual número precisaria estar piscando em
-      vermelho para você tomar uma atitude imediata?
+      Consulte os alertas registrados e acompanhe a análise da equipe responsável.
     </p>
   </header>
+  <div class="dash__filtros">
+    <label for="periodo">Período dos indicadores</label>
+    <select id="periodo" [(ngModel)]="periodo" (ngModelChange)="carregar()">
+      <option value="MES">Mês atual</option><option value="ANO">Ano atual</option><option value="TODOS">Todo o histórico</option>
+    </select>
+    <label for="rankingTipo">Ranking por</label>
+    <select id="rankingTipo" [(ngModel)]="porDocumento" (ngModelChange)="carregar()">
+      <option [ngValue]="false">OAB</option><option [ngValue]="true">CPF/CNPJ</option>
+    </select>
+  </div>
+  <div class="dash__erro" *ngIf="erro()" role="alert">
+    <p>{{ erro() }}</p><button class="lp-btn lp-btn--primary" (click)="carregar()">Tentar novamente</button>
+  </div>
 
   <div class="dash__loading" *ngIf="carregando()">Carregando dados do painel…</div>
 
-  <ng-container *ngIf="!carregando()">
+  <ng-container *ngIf="!carregando() && !erro()">
 
     <!-- Visão Executiva -->
     <section class="kpi-row">
       <div class="lp-card kpi-card">
         <span class="kpi-card__label">Total de denúncias</span>
         <strong class="kpi-card__value">{{ kpis()?.totalDenuncias ?? 0 }}</strong>
-        <span class="kpi-card__hint">Últimos 12 meses</span>
+        <span class="kpi-card__hint">{{ periodos[periodo] }}</span>
       </div>
       <div class="lp-card kpi-card kpi-card--alert">
         <span class="kpi-card__label">Volume processual afetado</span>
@@ -28,7 +40,7 @@
       <div class="lp-card kpi-card">
         <span class="kpi-card__label">Comarcas afetadas</span>
         <strong class="kpi-card__value">{{ kpis()?.comarcasAfetadas ?? 0 }}</strong>
-        <span class="kpi-card__hint">Sobre 20 comarcas monitoradas</span>
+        <span class="kpi-card__hint">Comarcas com alertas no período</span>
       </div>
     </section>
 
@@ -40,17 +52,18 @@
       </div>
       <table class="ranking-table">
         <thead>
-          <tr><th>#</th><th>OAB / CNPJ</th><th>Denúncias</th><th>Comarcas envolvidas</th></tr>
+          <tr><th>#</th><th>{{ porDocumento ? 'CPF / CNPJ' : 'OAB' }}</th><th>Denúncias</th><th>Comarcas envolvidas</th></tr>
         </thead>
         <tbody>
           <tr *ngFor="let item of ranking(); let i = index">
             <td class="ranking-table__pos">{{ i + 1 }}</td>
-            <td class="ranking-table__oab">{{ item.oabAdvogado }}</td>
+            <td class="ranking-table__oab">{{ item.identificador }}</td>
             <td>{{ item.totalDenuncias }}</td>
             <td>{{ item.comarcasEnvolvidas }}</td>
           </tr>
         </tbody>
       </table>
+      <p *ngIf="ranking().length === 0">Nenhum alerta para esse agrupamento no período.</p>
     </section>
 
     <!-- Visão Geográfica e Comportamental -->
@@ -88,7 +101,7 @@
     <section class="lp-card panel">
       <div class="panel__header">
         <h2>Tendência semanal de alertas</h2>
-        <span class="panel__hint">A linha precisa cair após um Provimento da Corregedoria</span>
+        <span class="panel__hint">Últimas 12 semanas · {{ periodos[periodo] }}</span>
       </div>
       <div class="chart-box chart-box--wide">
         <canvas #tendenciaCanvas></canvas>

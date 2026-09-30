@@ -83,7 +83,7 @@ export interface KpisResponse {
 }
 
 export interface RankingItem {
-  oabAdvogado: string;
+  identificador: string;
   totalDenuncias: number;
   comarcasEnvolvidas: number;
 }

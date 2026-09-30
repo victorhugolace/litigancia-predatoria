@@ -23,6 +23,7 @@ class ApiIntegrationTest {
     @Autowired DenunciaRepository repository;
     @Autowired DenunciaService service;
     @Autowired ObjectMapper mapper;
+    @Autowired org.springframework.jdbc.core.JdbcTemplate jdbc;
 
     @BeforeEach
     void limparBancoIsolado() { repository.deleteAll(); }
@@ -91,5 +92,27 @@ class ApiIntegrationTest {
             assertThat(protocols).hasSize(24);
             assertThat(repository.count()).isEqualTo(24);
         }
+    }
+
+    @Test
+    void filtraPeriodoECompletaSemanasSemAlertas() throws Exception {
+        var request = mapper.readValue(dadosValidos(), DenunciaRequest.class);
+        var atual = service.criar(request);
+        var antigo = service.criar(request);
+        jdbc.update("update denuncias set data_criacao = ? where id = ?",
+                java.time.LocalDate.now().minusYears(2).atStartOfDay(), antigo.getId());
+        mvc.perform(get("/api/dashboard/kpis").param("periodo", "ANO"))
+                .andExpect(jsonPath("$.totalDenuncias").value(1));
+        mvc.perform(get("/api/dashboard/kpis").param("periodo", "TODOS"))
+                .andExpect(jsonPath("$.totalDenuncias").value(2));
+        mvc.perform(get("/api/dashboard/tendencia"))
+                .andExpect(jsonPath("$.length()").value(12))
+                .andExpect(jsonPath("$[0].total").value(0))
+                .andExpect(jsonPath("$[11].total").value(1));
+        mvc.perform(get("/api/dashboard/ranking").param("porDocumento", "true"))
+                .andExpect(jsonPath("$[0].identificador").value("52998224725"))
+                .andExpect(jsonPath("$[0].totalDenuncias").value(1));
+        mvc.perform(get("/api/dashboard/kpis").param("periodo", "INVALIDO"))
+                .andExpect(status().isBadRequest());
     }
 }

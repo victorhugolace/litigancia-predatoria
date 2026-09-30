@@ -17,12 +17,12 @@ public class DashboardDtos {
     }
 
     public static class RankingItem {
-        public String oabAdvogado;
+        public String identificador;
         public long totalDenuncias;
         public long comarcasEnvolvidas;
 
         public RankingItem(String oabAdvogado, long totalDenuncias, long comarcasEnvolvidas) {
-            this.oabAdvogado = oabAdvogado;
+            this.identificador = oabAdvogado;
             this.totalDenuncias = totalDenuncias;
             this.comarcasEnvolvidas = comarcasEnvolvidas;
         }

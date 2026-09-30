@@ -1,4 +1,8 @@
 .dash__header { margin-bottom: 24px; }
+.dash__filtros { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-bottom: 20px; }
+.dash__filtros select { padding: 8px; border: 1px solid var(--lp-line); border-radius: 4px; }
+.dash__erro { padding: 24px; background: var(--lp-alert-100); color: var(--lp-alert-700); }
+.dash__erro p { margin-bottom: 12px; }
 
 .dash__eyebrow {
   display: inline-block;

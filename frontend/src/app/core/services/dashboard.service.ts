@@ -10,23 +10,23 @@ export class DashboardService {
 
   constructor(private http: HttpClient) {}
 
-  kpis(): Observable<KpisResponse> {
-    return this.http.get<KpisResponse>(`${this.baseUrl}/kpis`);
+  kpis(periodo = 'ANO'): Observable<KpisResponse> {
+    return this.http.get<KpisResponse>(`${this.baseUrl}/kpis`, { params: { periodo } });
   }
 
-  ranking(): Observable<RankingItem[]> {
-    return this.http.get<RankingItem[]>(`${this.baseUrl}/ranking`);
+  ranking(periodo = 'ANO', porDocumento = false): Observable<RankingItem[]> {
+    return this.http.get<RankingItem[]>(`${this.baseUrl}/ranking`, { params: { periodo, porDocumento } });
   }
 
-  tipologia(): Observable<TipologiaItem[]> {
-    return this.http.get<TipologiaItem[]>(`${this.baseUrl}/tipologia`);
+  tipologia(periodo = 'ANO'): Observable<TipologiaItem[]> {
+    return this.http.get<TipologiaItem[]>(`${this.baseUrl}/tipologia`, { params: { periodo } });
   }
 
-  comarcas(): Observable<ComarcaItem[]> {
-    return this.http.get<ComarcaItem[]>(`${this.baseUrl}/comarcas`);
+  comarcas(periodo = 'ANO'): Observable<ComarcaItem[]> {
+    return this.http.get<ComarcaItem[]>(`${this.baseUrl}/comarcas`, { params: { periodo } });
   }
 
-  tendencia(): Observable<TendenciaItem[]> {
-    return this.http.get<TendenciaItem[]>(`${this.baseUrl}/tendencia`);
+  tendencia(periodo = 'ANO'): Observable<TendenciaItem[]> {
+    return this.http.get<TendenciaItem[]>(`${this.baseUrl}/tendencia`, { params: { periodo } });
   }
 }

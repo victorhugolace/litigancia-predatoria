@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild, signal } from '@angular/core';
-import { forkJoin } from 'rxjs';
+import { forkJoin, Subscription } from 'rxjs';
+import { FormsModule } from '@angular/forms';
 import { Chart, registerables } from 'chart.js';
 import { DashboardService } from '../../core/services/dashboard.service';
 import { DenunciaService } from '../../core/services/denuncia.service';
@@ -14,7 +15,7 @@ Chart.register(...registerables);
 @Component({
   selector: 'lp-dashboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
@@ -26,6 +27,10 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   readonly statusLabels = STATUS_LABELS;
 
   carregando = signal(true);
+  erro = signal<string | null>(null);
+  periodo = 'ANO';
+  porDocumento = false;
+  readonly periodos: Record<string, string> = { MES: 'Mês atual', ANO: 'Ano atual', TODOS: 'Todo o histórico' };
   kpis = signal<KpisResponse | null>(null);
   ranking = signal<RankingItem[]>([]);
   tipologias = signal<TipologiaItem[]>([]);
@@ -36,16 +41,26 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private tipologiaChart?: Chart;
   private tendenciaChart?: Chart;
+  private requisicao?: Subscription;
+  private chartTimer?: ReturnType<typeof setTimeout>;
 
   constructor(private dashboardService: DashboardService, private denunciaService: DenunciaService) {}
 
   ngOnInit(): void {
-    forkJoin({
-      kpis: this.dashboardService.kpis(),
-      ranking: this.dashboardService.ranking(),
-      tipologia: this.dashboardService.tipologia(),
-      comarcas: this.dashboardService.comarcas(),
-      tendencia: this.dashboardService.tendencia(),
+    this.carregar();
+  }
+
+  carregar(): void {
+    this.requisicao?.unsubscribe();
+    clearTimeout(this.chartTimer);
+    this.carregando.set(true);
+    this.erro.set(null);
+    this.requisicao = forkJoin({
+      kpis: this.dashboardService.kpis(this.periodo),
+      ranking: this.dashboardService.ranking(this.periodo, this.porDocumento),
+      tipologia: this.dashboardService.tipologia(this.periodo),
+      comarcas: this.dashboardService.comarcas(this.periodo),
+      tendencia: this.dashboardService.tendencia(this.periodo),
       denuncias: this.denunciaService.listar()
     }).subscribe({
       next: dados => {
@@ -56,15 +71,20 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
         this.tendencia.set(dados.tendencia);
         this.denuncias.set(dados.denuncias);
         this.carregando.set(false);
-        setTimeout(() => this.renderCharts(), 0);
+        this.chartTimer = setTimeout(() => this.renderCharts(), 0);
       },
-      error: () => this.carregando.set(false)
+      error: () => {
+        this.carregando.set(false);
+        this.erro.set('Não foi possível carregar o painel. Verifique a conexão e tente novamente.');
+      }
     });
   }
 
   ngAfterViewInit(): void {}
 
   ngOnDestroy(): void {
+    this.requisicao?.unsubscribe();
+    clearTimeout(this.chartTimer);
     this.tipologiaChart?.destroy();
     this.tendenciaChart?.destroy();
   }
@@ -133,7 +153,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private formatarSemana(iso: string): string {
-    const d = new Date(iso);
+    const d = new Date(`${iso}T12:00:00`);
     return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
   }
 

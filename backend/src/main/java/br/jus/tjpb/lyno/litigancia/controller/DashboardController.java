@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import br.jus.tjpb.lyno.litigancia.model.Periodo;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequestMapping("/api/dashboard")
@@ -19,27 +21,28 @@ public class DashboardController {
     }
 
     @GetMapping("/kpis")
-    public KpisResponse kpis() {
-        return service.kpis();
+    public KpisResponse kpis(@RequestParam(defaultValue = "ANO") Periodo periodo) {
+        return service.kpis(periodo);
     }
 
     @GetMapping("/ranking")
-    public List<RankingItem> ranking() {
-        return service.ranking();
+    public List<RankingItem> ranking(@RequestParam(defaultValue = "ANO") Periodo periodo,
+                                    @RequestParam(defaultValue = "false") boolean porDocumento) {
+        return service.ranking(periodo, porDocumento);
     }
 
     @GetMapping("/tipologia")
-    public List<TipologiaItem> tipologia() {
-        return service.distribuicaoTipologia();
+    public List<TipologiaItem> tipologia(@RequestParam(defaultValue = "ANO") Periodo periodo) {
+        return service.distribuicaoTipologia(periodo);
     }
 
     @GetMapping("/comarcas")
-    public List<ComarcaItem> comarcas() {
-        return service.distribuicaoComarcas();
+    public List<ComarcaItem> comarcas(@RequestParam(defaultValue = "ANO") Periodo periodo) {
+        return service.distribuicaoComarcas(periodo);
     }
 
     @GetMapping("/tendencia")
-    public List<TendenciaItem> tendencia() {
-        return service.tendenciaSemanal();
+    public List<TendenciaItem> tendencia(@RequestParam(defaultValue = "ANO") Periodo periodo) {
+        return service.tendenciaSemanal(periodo);
     }
 }

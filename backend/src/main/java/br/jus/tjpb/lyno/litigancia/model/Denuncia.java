@@ -77,13 +77,8 @@ public class Denuncia {
 
     @PrePersist
     protected void onCreate() {
-        dataCriacao = LocalDateTime.now();
-        dataAtualizacao = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        dataAtualizacao = LocalDateTime.now();
+        if (dataCriacao == null) dataCriacao = LocalDateTime.now(java.time.ZoneId.of("America/Recife"));
+        if (dataAtualizacao == null) dataAtualizacao = dataCriacao;
     }
 
     // --- Getters e setters ---
