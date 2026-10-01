@@ -25,7 +25,7 @@ public class DenunciaRequest {
     @Pattern(regexp = "[A-Z]{2}[0-9]{1,10}[A-Z]?", message = "Informe a UF e o número da OAB (ex.: PB12345)")
     private String oabAdvogado;
 
-    @Pattern(regexp = "([0-9]{11}|[0-9]{14})?", message = "Informe um CPF ou CNPJ completo")
+    @Pattern(regexp = "([0-9]{11}|[A-Z0-9]{12}[0-9]{2})?", message = "Informe um CPF ou CNPJ completo")
     private String cpfCnpjParte;
 
     @NotNull(message = "Selecione a tipologia da ação")
@@ -59,7 +59,7 @@ public class DenunciaRequest {
     @AssertTrue(message = "CPF/CNPJ com dígitos verificadores inválidos")
     public boolean isDocumentoValido() {
         if (cpfCnpjParte == null || cpfCnpjParte.isEmpty()) return true;
-        if (!cpfCnpjParte.matches("[0-9]{11}|[0-9]{14}")) return false;
+        if (!cpfCnpjParte.matches("[0-9]{11}|[A-Z0-9]{12}[0-9]{2}")) return false;
         if (cpfCnpjParte.chars().distinct().count() == 1) return false;
         int length = cpfCnpjParte.length();
         for (int i = length - 2; i < length; i++) {
@@ -91,7 +91,7 @@ public class DenunciaRequest {
     public void setOabAdvogado(String oabAdvogado) { this.oabAdvogado = oabAdvogado == null ? null : oabAdvogado.toUpperCase(Locale.ROOT).replaceAll("[\\s/.-]", ""); }
 
     public String getCpfCnpjParte() { return cpfCnpjParte; }
-    public void setCpfCnpjParte(String cpfCnpjParte) { this.cpfCnpjParte = cpfCnpjParte == null ? null : cpfCnpjParte.replaceAll("[\\s./-]", ""); }
+    public void setCpfCnpjParte(String cpfCnpjParte) { this.cpfCnpjParte = cpfCnpjParte == null ? null : cpfCnpjParte.toUpperCase(Locale.ROOT).replaceAll("[\\s./-]", ""); }
 
     public Tipologia getTipologia() { return tipologia; }
     public void setTipologia(Tipologia tipologia) { this.tipologia = tipologia; }

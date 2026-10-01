@@ -85,7 +85,7 @@
                formControlName="cpfCnpjParte"
                (input)="aplicarMascaraCpfCnpj($event)"
                maxlength="18"
-               placeholder="000.000.000-00 ou 00.000.000/0000-00">
+               placeholder="CPF ou CNPJ, inclusive com letras">
         <span class="field__error" *ngIf="form.get('cpfCnpjParte')?.touched && form.get('cpfCnpjParte')?.invalid">Confira os dígitos do CPF/CNPJ.</span>
       </div>
     </section>

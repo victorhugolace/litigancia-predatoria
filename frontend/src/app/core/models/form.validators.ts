@@ -8,14 +8,14 @@ export const oabValida: ValidatorFn = control =>
     ? null : { oab: true };
 
 export function documentoValido(control: AbstractControl): ValidationErrors | null {
-  const value = String(control.value ?? '').replace(/[\s./-]/g, '');
+  const value = String(control.value ?? '').toUpperCase().replace(/[\s./-]/g, '');
   if (!value) return null;
-  if (!/^(\d{11}|\d{14})$/.test(value) || new Set(value).size === 1) return { documento: true };
+  if (!/^(\d{11}|[A-Z0-9]{12}\d{2})$/.test(value) || new Set(value).size === 1) return { documento: true };
   for (let i = value.length - 2; i < value.length; i++) {
     let sum = 0;
     for (let j = 0; j < i; j++) {
       const weight = value.length === 11 ? i + 1 - j : (i - 1 - j) % 8 + 2;
-      sum += Number(value[j]) * weight;
+      sum += (value.charCodeAt(j) - 48) * weight;
     }
     const remainder = sum % 11;
     if (Number(value[i]) !== (remainder < 2 ? 0 : 11 - remainder)) return { documento: true };

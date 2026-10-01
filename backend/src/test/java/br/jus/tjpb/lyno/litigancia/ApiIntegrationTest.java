@@ -84,6 +84,24 @@ class ApiIntegrationTest {
     }
 
     @Test
+    void aceitaCnpjNumericoEAlfanumericoSemPerderLetras() throws Exception {
+        for (var exemplo : java.util.Map.of("11.222.333/0001-81", "11222333000181",
+                "12.abc.345/01de-35", "12ABC34501DE35", "00.000.000/e08g-12", "00000000E08G12").entrySet()) {
+            mvc.perform(post("/api/denuncias").with(csrf()).contentType("application/json")
+                            .content(dadosValidos().replace("529.982.247-25", exemplo.getKey())))
+                    .andExpect(status().isCreated()).andExpect(jsonPath("$.cpfCnpjParte").value(exemplo.getValue()));
+        }
+        for (String invalido : java.util.List.of("12.ABC.345/01DE-36", "12.ABC.345/01DE-3A", "@2.ABC.345/01DE-35")) {
+            mvc.perform(post("/api/denuncias").with(csrf()).contentType("application/json")
+                            .content(dadosValidos().replace("529.982.247-25", invalido)))
+                    .andExpect(status().isBadRequest());
+        }
+        assertThat(repository.count()).isEqualTo(3);
+        mvc.perform(get("/api/dashboard/ranking").param("porDocumento", "true"))
+                .andExpect(jsonPath("$[0].identificador").value("00000000E08G12"));
+    }
+
+    @Test
     void geraProtocolosUnicosEmEnviosSimultaneos() throws Exception {
         DenunciaRequest request = mapper.readValue(dadosValidos(), DenunciaRequest.class);
         try (var executor = Executors.newFixedThreadPool(6)) {
