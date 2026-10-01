@@ -46,7 +46,7 @@ export class DenunciaFormComponent {
     this.form = this.fb.group({
       comarca: ['', [textoObrigatorio, Validators.maxLength(120)]],
       nomeComunicante: ['', [textoObrigatorio, Validators.maxLength(150)]],
-      matriculaComunicante: ['', [textoObrigatorio, Validators.maxLength(30)]],
+      matriculaComunicante: ['', Validators.maxLength(30)],
       oabAdvogado: ['', [textoObrigatorio, oabValida]],
       cpfCnpjParte: ['', documentoValido],
       tipologia: [null as Tipologia | null, Validators.required],

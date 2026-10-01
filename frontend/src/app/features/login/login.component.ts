@@ -1,16 +1,20 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 
 @Component({
-  selector: 'lp-login', standalone: true, imports: [CommonModule, ReactiveFormsModule],
+  selector: 'lp-login', standalone: true, imports: [CommonModule, ReactiveFormsModule, RouterLink],
   template: `
     <section class="lp-card login">
-      <h1>Entrar na aplicação</h1>
-      <p>Use sua conta de comunicante ou analista para acessar os casos permitidos ao seu perfil.</p>
-      <p *ngIf="auth.sessao().demo">Ambiente de demonstração com dados fictícios.</p>
+      <h1>Entrar na área gerencial</h1>
+      <p>Acesso da equipe responsável pela triagem e análise das denúncias.</p>
+      <p>Para <a routerLink="/denunciar">registrar uma denúncia</a> ou <a routerLink="/acompanhar">acompanhar o protocolo</a>, não é necessário login.</p>
+      <div *ngIf="auth.sessao().demo" class="demo-access">
+        <p>Conta de demonstração:</p>
+        <p>Usuário: <code>analista</code><br>Senha: <code>oficina-analista</code></p>
+      </div>
       <form [formGroup]="form" (ngSubmit)="entrar()">
         <div class="field"><label for="usuario">Usuário</label><input id="usuario" autocomplete="username" formControlName="usuario" maxlength="120"></div>
         <div class="field"><label for="senha">Senha</label><input id="senha" type="password" autocomplete="current-password" formControlName="senha"></div>
@@ -37,9 +41,14 @@ export class LoginComponent {
         this.enviando.set(false); this.form.get('senha')!.reset();
         if (!sessao.autenticado) { this.erro.set('Não foi possível confirmar a sessão. Tente novamente.'); return; }
         const retorno = this.route.snapshot.queryParamMap.get('retorno');
-        this.router.navigateByUrl(retorno?.startsWith('/') && !retorno.startsWith('//') ? retorno : this.auth.analista ? '/painel' : '/denunciar');
+        this.router.navigateByUrl(retorno?.startsWith('/painel') ? retorno : '/painel');
       },
-      error: e => { this.enviando.set(false); this.erro.set(e.error?.mensagem ?? e.message ?? 'Não foi possível entrar.'); }
+      error: e => {
+        this.enviando.set(false);
+        this.erro.set(e.status === 0 || e.status >= 500 || e.name === 'TimeoutError'
+          ? 'A API está indisponível. Aguarde e tente entrar novamente.'
+          : e.error?.mensagem ?? e.message ?? 'Não foi possível entrar.');
+      }
     });
   }
 }

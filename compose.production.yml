@@ -8,7 +8,6 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: production
       DB_PASSWORD: ${DB_PASSWORD:?Defina DB_PASSWORD para o banco institucional}
-      APP_REPORTER_PASSWORD: ${APP_REPORTER_PASSWORD:?Defina APP_REPORTER_PASSWORD}
       APP_ANALYST_PASSWORD: ${APP_ANALYST_PASSWORD:?Defina APP_ANALYST_PASSWORD}
       CORS_ORIGINS: ${CORS_ORIGINS:?Defina a origem HTTPS da aplicacao}
       SESSION_COOKIE_SECURE: "true"

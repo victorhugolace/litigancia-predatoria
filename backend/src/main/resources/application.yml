@@ -9,10 +9,8 @@ server:
         secure: ${SESSION_COOKIE_SECURE:false}
 
 app:
-  cors-origins: ${CORS_ORIGINS:http://localhost:4200}
+  cors-origins: ${CORS_ORIGINS:http://localhost:4200,http://127.0.0.1:4200}
   auth:
-    reporter-user: ${APP_REPORTER_USER:comunicante}
-    reporter-password: ${APP_REPORTER_PASSWORD:}
     analyst-user: ${APP_ANALYST_USER:analista}
     analyst-password: ${APP_ANALYST_PASSWORD:}
 

@@ -24,11 +24,11 @@ export class AuthService {
     return this.restaurar().pipe(switchMap(sessao => {
       if (!sessao.csrfToken) return throwError(() => new Error('Não foi possível conectar à aplicação. Tente novamente.'));
       const body = new HttpParams().set('username', usuario.trim()).set('password', senha);
-      return this.http.post('/api/login', body);
+      return this.http.post('/api/login', body).pipe(timeout(15000));
     }), switchMap(() => this.restaurar()));
   }
 
   sair() {
-    return this.http.post('/api/logout', {}).pipe(tap(() => this.limpar()), switchMap(() => this.restaurar()));
+    return this.http.post('/api/logout', {}).pipe(timeout(15000), tap(() => this.limpar()), switchMap(() => this.restaurar()));
   }
 }

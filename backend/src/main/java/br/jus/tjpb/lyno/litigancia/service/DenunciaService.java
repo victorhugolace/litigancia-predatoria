@@ -68,7 +68,8 @@ public class DenunciaService {
         d.setDataAtualizacao(d.getDataCriacao());
 
         Denuncia salvo = repository.save(d);
-        historicoRepository.save(new br.jus.tjpb.lyno.litigancia.model.Historico(salvo, null, usuario, salvo.getDataCriacao()));
+        historicoRepository.save(new br.jus.tjpb.lyno.litigancia.model.Historico(salvo, null,
+                usuario != null ? usuario : "Canal público", salvo.getDataCriacao()));
         return DenunciaResponse.from(salvo);
     }
 
@@ -130,17 +131,17 @@ public class DenunciaService {
     public void verificarAcesso(Long id, org.springframework.security.core.Authentication auth) {
         var denuncia = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Denúncia não encontrada"));
         boolean analista = auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ANALISTA"));
-        if (!analista && (auth == null || !auth.getName().equals(denuncia.getCriadoPor()))) {
+        if (!analista) {
             throw new EntityNotFoundException("Denúncia não encontrada");
         }
     }
 
     @Transactional(readOnly = true)
-    public DenunciaResponse buscarPorProtocolo(String protocolo, org.springframework.security.core.Authentication auth) {
+    public br.jus.tjpb.lyno.litigancia.dto.AcompanhamentoResponse acompanhar(String protocolo) {
         var denuncia = repository.findByNumeroProtocolo(protocolo.strip().toUpperCase(java.util.Locale.ROOT))
                 .orElseThrow(() -> new EntityNotFoundException("Denúncia não encontrada"));
-        verificarAcesso(denuncia.getId(), auth);
-        return buscar(denuncia.getId());
+        return new br.jus.tjpb.lyno.litigancia.dto.AcompanhamentoResponse(denuncia.getNumeroProtocolo(),
+                denuncia.getStatus(), denuncia.getStatus().getDescricao(), denuncia.getDataCriacao(), denuncia.getDataAtualizacao());
     }
 
     private String gerarNumeroProtocolo() {

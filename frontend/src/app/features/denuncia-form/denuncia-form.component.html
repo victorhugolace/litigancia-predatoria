@@ -37,7 +37,7 @@
     <!-- Passo 1: Identificação da origem -->
     <section class="form-step" *ngIf="currentStep() === 0">
       <h2>Identificação da origem</h2>
-      <p class="form-step__hint">Informe a origem do alerta. A conta {{ auth.sessao().usuario }} ficará vinculada ao registro.</p>
+      <p class="form-step__hint">Canal público: não é necessário criar conta ou fazer login. Informe a origem do alerta e guarde o protocolo após o envio.</p>
 
       <div class="field">
         <label for="comarca">Comarca / Unidade Judiciária</label>
@@ -50,16 +50,16 @@
       <div class="field-row">
         <div class="field">
           <label for="nomeComunicante">Nome do comunicante</label>
-          <input id="nomeComunicante" type="text" formControlName="nomeComunicante" maxlength="150" placeholder="Ex.: Juiz(a) titular da 3ª Vara">
+          <input id="nomeComunicante" type="text" formControlName="nomeComunicante" maxlength="150" placeholder="Seu nome completo">
           <span class="field__error" *ngIf="form.get('nomeComunicante')?.touched && form.get('nomeComunicante')?.invalid">
             Informe o nome do comunicante.
           </span>
         </div>
         <div class="field">
-          <label for="matriculaComunicante">Matrícula</label>
+          <label for="matriculaComunicante">Matrícula <em>(se houver)</em></label>
           <input id="matriculaComunicante" type="text" formControlName="matriculaComunicante" maxlength="30" placeholder="Ex.: MAT2201">
           <span class="field__error" *ngIf="form.get('matriculaComunicante')?.touched && form.get('matriculaComunicante')?.invalid">
-            Essencial para a Corregedoria dar a devolutiva depois.
+            Informe até 30 caracteres.
           </span>
         </div>
       </div>

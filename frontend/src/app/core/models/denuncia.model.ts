@@ -79,6 +79,14 @@ export interface DenunciaResponse {
   dataAtualizacao: string;
 }
 
+export interface AcompanhamentoResponse {
+  numeroProtocolo: string;
+  status: StatusDenuncia;
+  statusDescricao: string;
+  dataCriacao: string;
+  dataAtualizacao: string;
+}
+
 export interface HistoricoItem {
   id: number;
   statusAnterior: StatusDenuncia | null;

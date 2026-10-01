@@ -41,11 +41,9 @@ services:
       DB_USER: ${DB_USER:-lyno}
       DB_PASSWORD: ${DB_PASSWORD:-lyno}
       SPRING_PROFILES_ACTIVE: demo
-      APP_REPORTER_USER: ${APP_REPORTER_USER:-comunicante}
-      APP_REPORTER_PASSWORD: ${APP_REPORTER_PASSWORD:-oficina-comunicante}
       APP_ANALYST_USER: ${APP_ANALYST_USER:-analista}
       APP_ANALYST_PASSWORD: ${APP_ANALYST_PASSWORD:-oficina-analista}
-      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:4200}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:4200,http://127.0.0.1:4200}
     ports:
       - "127.0.0.1:8080:8080"
     healthcheck:

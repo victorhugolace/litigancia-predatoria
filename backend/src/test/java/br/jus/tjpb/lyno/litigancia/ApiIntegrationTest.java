@@ -197,23 +197,67 @@ class ApiIntegrationTest {
 
     @Test
     @org.springframework.security.test.context.support.WithAnonymousUser
-    void exigeLoginECsrf() throws Exception {
+    void protegeAreaGerencialEMantemCsrfNoCanalPublico() throws Exception {
         mvc.perform(get("/api/denuncias")).andExpect(status().isUnauthorized());
         mvc.perform(get("/api/dashboard/kpis")).andExpect(status().isUnauthorized());
-        mvc.perform(post("/api/denuncias").with(user("analista").roles("ANALISTA"))
+        mvc.perform(post("/api/denuncias")
                 .contentType("application/json").content(dadosValidos())).andExpect(status().isForbidden());
     }
 
     @Test
-    void restringeComunicanteAosPropriosCasosEAuditaAutor() throws Exception {
+    @org.springframework.security.test.context.support.WithAnonymousUser
+    void registraSemLoginOuMatriculaEPublicaSomenteAndamento() throws Exception {
+        var dados = (com.fasterxml.jackson.databind.node.ObjectNode) mapper.readTree(dadosValidos());
+        dados.remove("matriculaComunicante");
+        var result = mvc.perform(post("/api/denuncias").with(csrf()).contentType("application/json")
+                .content(mapper.writeValueAsString(dados)))
+                .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
+        var tree = mapper.readTree(result);
+        long id = tree.get("id").asLong();
+        String protocolo = tree.get("numeroProtocolo").asText();
+        assertThat(repository.findById(id).orElseThrow().getCriadoPor()).isNull();
+        service.atualizarStatus(id, mapper.readValue("{\"versao\":0,\"status\":\"EM_ANALISE_NUMOPED\",\"notaTecnicaResumo\":\"Nota restrita\"}",
+                br.jus.tjpb.lyno.litigancia.dto.DashboardDtos.StatusUpdateRequest.class), "analista");
+        var publico = mvc.perform(get("/api/denuncias/protocolo/" + protocolo.toLowerCase(java.util.Locale.ROOT)))
+                .andExpect(status().isOk()).andExpect(header().string("Cache-Control", "no-store"))
+                .andExpect(jsonPath("$.status").value("EM_ANALISE_NUMOPED"))
+                .andReturn().getResponse().getContentAsString();
+        assertThat(mapper.readTree(publico).properties()).extracting(java.util.Map.Entry::getKey)
+                .containsExactlyInAnyOrder("numeroProtocolo", "status", "statusDescricao", "dataCriacao", "dataAtualizacao");
+        mvc.perform(get("/api/denuncias/" + id)).andExpect(status().isUnauthorized());
+        mvc.perform(patch("/api/denuncias/" + id + "/status").with(csrf()).contentType("application/json")
+                .content("{\"versao\":1,\"status\":\"ARQUIVADO\"}")).andExpect(status().isUnauthorized());
+        mvc.perform(get("/api/denuncias/protocolo/LP-INEXISTENTE")).andExpect(status().isNotFound());
+        mvc.perform(get("/api/denuncias/" + id).with(user("analista").roles("ANALISTA")))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.historico[1].autor").value("Canal público"))
+                .andExpect(jsonPath("$.notaTecnicaResumo").value("Nota restrita"));
+    }
+
+    @Test
+    @org.springframework.security.test.context.support.WithAnonymousUser
+    void recebePdfNoCanalPublicoEMantemDownloadRestrito() throws Exception {
+        byte[] pdf = "%PDF-1.4\nDocumento público de teste\n%%EOF".getBytes(java.nio.charset.StandardCharsets.UTF_8);
+        var dados = new org.springframework.mock.web.MockMultipartFile("dados", "", "application/json", dadosValidos().getBytes(java.nio.charset.StandardCharsets.UTF_8));
+        var arquivo = new org.springframework.mock.web.MockMultipartFile("arquivos", "evidencia.pdf", "application/pdf", pdf);
+        var result = mvc.perform(multipart("/api/denuncias").file(dados).file(arquivo).with(csrf()))
+                .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
+        var tree = mapper.readTree(result);
+        String url = "/api/denuncias/" + tree.get("id").asLong() + "/documentos/" + tree.get("documentos").get(0).get("id").asText();
+        mvc.perform(get(url)).andExpect(status().isUnauthorized());
+        mvc.perform(get(url).with(user("analista").roles("ANALISTA")))
+                .andExpect(status().isOk()).andExpect(content().bytes(pdf));
+    }
+
+    @Test
+    void restringeDadosInternosAEquipeGerencial() throws Exception {
         var propria = service.criar(mapper.readValue(dadosValidos(), DenunciaRequest.class), "comunicante");
         var alheia = service.criar(mapper.readValue(dadosValidos(), DenunciaRequest.class), "outro");
         mvc.perform(get("/api/denuncias/" + propria.getId()).with(user("comunicante").roles("COMUNICANTE")))
-                .andExpect(status().isOk()).andExpect(jsonPath("$.historico[0].autor").value("comunicante"));
+                .andExpect(status().isForbidden());
         mvc.perform(get("/api/denuncias/protocolo/" + propria.getNumeroProtocolo()).with(user("comunicante").roles("COMUNICANTE")))
                 .andExpect(status().isOk());
         mvc.perform(get("/api/denuncias/" + alheia.getId()).with(user("comunicante").roles("COMUNICANTE")))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isForbidden());
         mvc.perform(get("/api/dashboard/kpis").with(user("comunicante").roles("COMUNICANTE"))).andExpect(status().isForbidden());
         mvc.perform(get("/api/denuncias").with(user("comunicante").roles("COMUNICANTE"))).andExpect(status().isForbidden());
         mvc.perform(patch("/api/denuncias/" + propria.getId() + "/status").with(user("comunicante").roles("COMUNICANTE"))
@@ -230,6 +274,9 @@ class ApiIntegrationTest {
         // A partir daqui, exercita o contexto real salvo na sessão pelo login.
         org.springframework.security.test.context.TestSecurityContextHolder.clearContext();
         mvc.perform(post("/api/login").session(session).header("X-CSRF-TOKEN", csrfToken)
+                        .param("username", "analista").param("password", "senha-incorreta"))
+                .andExpect(status().isUnauthorized()).andExpect(jsonPath("$.mensagem").value("Usuário ou senha inválidos"));
+        mvc.perform(post("/api/login").session(session).header("X-CSRF-TOKEN", csrfToken)
                         .param("username", "analista").param("password", "senha-teste-analista"))
                 .andExpect(status().isNoContent());
         var autenticada = mvc.perform(get("/api/session").session(session)).andExpect(jsonPath("$.autenticado").value(true)).andReturn();
@@ -239,5 +286,15 @@ class ApiIntegrationTest {
                 .andExpect(status().isCreated());
         mvc.perform(post("/api/logout").session(session).header("X-CSRF-TOKEN", novoCsrf)).andExpect(status().isNoContent());
         mvc.perform(get("/api/denuncias")).andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @org.springframework.security.test.context.support.WithAnonymousUser
+    void permiteOrigensLocaisSemAbrirCorsParaTerceiros() throws Exception {
+        for (String origem : java.util.List.of("http://localhost:4200", "http://127.0.0.1:4200")) {
+            mvc.perform(get("/api/session").header("Origin", origem)).andExpect(status().isOk());
+        }
+        mvc.perform(get("/api/session").header("Origin", "https://origem-nao-permitida.example"))
+                .andExpect(status().isForbidden());
     }
 }

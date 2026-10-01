@@ -26,7 +26,7 @@ public class DenunciaController {
 
     @PostMapping(consumes = "application/json")
     public ResponseEntity<DenunciaResponse> criar(@Valid @RequestBody DenunciaRequest request, org.springframework.security.core.Authentication auth) {
-        DenunciaResponse response = service.criar(request, auth.getName());
+        DenunciaResponse response = service.criar(request, autor(auth));
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -34,7 +34,7 @@ public class DenunciaController {
     public ResponseEntity<DenunciaResponse> criarComDocumentos(@Valid @RequestPart("dados") DenunciaRequest request,
             @RequestPart(value = "arquivos", required = false) org.springframework.web.multipart.MultipartFile[] arquivos,
             org.springframework.security.core.Authentication auth) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(service.criarComDocumentos(request, arquivos, auth.getName()));
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.criarComDocumentos(request, arquivos, autor(auth)));
     }
 
     @GetMapping("/{id}/documentos/{documentoId}")
@@ -60,8 +60,15 @@ public class DenunciaController {
     }
 
     @GetMapping("/protocolo/{protocolo}")
-    public DenunciaResponse acompanhar(@PathVariable String protocolo, org.springframework.security.core.Authentication auth) {
-        return service.buscarPorProtocolo(protocolo, auth);
+    public ResponseEntity<br.jus.tjpb.lyno.litigancia.dto.AcompanhamentoResponse> acompanhar(@PathVariable String protocolo) {
+        return ResponseEntity.ok().cacheControl(org.springframework.http.CacheControl.noStore())
+                .body(service.acompanhar(protocolo));
+    }
+
+    private String autor(org.springframework.security.core.Authentication auth) {
+        return auth != null && auth.isAuthenticated()
+                && !(auth instanceof org.springframework.security.authentication.AnonymousAuthenticationToken)
+                ? auth.getName() : null;
     }
 
     @PatchMapping("/{id}/status")

@@ -4,7 +4,7 @@ Referência: **Esqueleto das entregas da Oficina de Litigância Predatória.pdf*
 
 | Parte do documento | Implementação local |
 | --- | --- |
-| Identificação da origem | Comarca, nome e matrícula; identidade institucional depende de SSO |
+| Identificação da origem | Canal público sem login: comarca, nome e matrícula opcional; identidade institucional depende de SSO |
 | Alvo da suspeita | OAB obrigatória; CPF/CNPJ opcional, inclusive CNPJ alfanumérico; normalização e dígitos verificadores |
 | Tipologia | Seleção única das seis categorias; descrição obrigatória em Outros |
 | Materialidade | De 3 a 5 processos distintos com máscara CNJ, relato de 500 caracteres, PDFs |
@@ -27,8 +27,10 @@ indicada no documento. A aplicação registra suspeitas e não decide se há fra
 ## Dados e implantação
 
 O perfil `demo` carrega registros fictícios para a oficina. Fora desse perfil, não há seed.
-Há autenticação local por sessão, com perfis comunicante e analista, autoria e consulta
-restrita por caso. As duas contas configuráveis não substituem a identidade institucional.
+Há autenticação local por sessão para a equipe gerencial. Registro e acompanhamento
+do andamento por protocolo são públicos. Detalhes, PDFs e análise exigem o perfil
+analista; o registro público é identificado no histórico como "Canal público".
+A conta gerencial configurável não substitui a identidade institucional.
 As datas do seed são calculadas em relação à semana de sua primeira carga; reiniciar a aplicação
 não modifica registros existentes. Nunca utilizar o banco demonstrativo como base institucional.
 

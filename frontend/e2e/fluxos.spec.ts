@@ -1,38 +1,55 @@
 import { test, expect, Page } from '@playwright/test';
 import { readdirSync, readFileSync } from 'node:fs';
 
-async function entrar(page: Page, usuario: 'comunicante' | 'analista') {
+async function entrar(page: Page) {
   await page.goto('/entrar');
-  await page.getByLabel('Usuário', { exact: true }).fill(usuario);
-  await page.getByLabel('Senha', { exact: true }).fill(`oficina-${usuario}`);
+  await page.getByLabel('Usuário', { exact: true }).fill('analista');
+  await page.getByLabel('Senha', { exact: true }).fill('oficina-analista');
   await page.getByRole('button', { name: 'Entrar', exact: true }).click();
-  await expect(page.getByRole('button', { name: `Sair (${usuario})` })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Sair (analista)' })).toBeVisible();
 }
 
 async function semOverflow(page: Page) {
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
 }
 
-test('redireciona anônimo e mostra credenciais inválidas', async ({ page }) => {
+test('abre canal público, protege gestão e permite login após senha inválida', async ({ page }, info) => {
+  await page.goto('/');
+  await expect(page.getByRole('heading', { name: 'Reportar padrão suspeito' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Área gerencial' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Painel de Controle' })).toHaveCount(0);
+  await page.getByRole('link', { name: 'Acompanhar caso', exact: true }).click();
+  await expect(page.getByLabel('Número de protocolo')).toBeVisible();
   await page.goto('/painel');
   await expect(page).toHaveURL(/\/entrar/);
   await page.getByLabel('Usuário', { exact: true }).fill('analista');
   await page.getByLabel('Senha', { exact: true }).fill('senha-incorreta');
   await page.getByRole('button', { name: 'Entrar', exact: true }).click();
   await expect(page.getByRole('alert')).toContainText('Usuário ou senha inválidos');
+  await expect(page.locator('.demo-access')).toContainText('oficina-analista');
+  await page.getByLabel('Senha', { exact: true }).fill('oficina-analista');
+  await page.getByRole('button', { name: 'Entrar', exact: true }).click();
+  await expect(page).toHaveURL(/\/painel$/);
+  await expect(page.locator('.kpi-card')).toHaveCount(3);
+  await page.reload();
+  await expect(page.getByRole('button', { name: 'Sair (analista)' })).toBeVisible();
+  await page.getByRole('button', { name: 'Sair (analista)' }).click();
+  await expect(page).toHaveURL(/\/denunciar$/);
+  await page.goto('/painel');
+  await expect(page).toHaveURL(/\/entrar/);
   await semOverflow(page);
+  await page.screenshot({ path: info.outputPath('login-gerencial.png'), fullPage: true });
 });
 
-test('comunicante registra PDF, acompanha protocolo e encerra sessão', async ({ page }, info) => {
+test('público registra PDF sem conta, acompanha andamento e gestão acessa o documento', async ({ page, context }, info) => {
   const falhas: string[] = [];
   page.on('pageerror', erro => falhas.push(erro.message));
-  await entrar(page, 'comunicante');
+  await page.goto('/denunciar');
   await expect(page.getByRole('link', { name: 'Painel de Controle' })).toHaveCount(0);
   await page.getByRole('button', { name: 'Continuar', exact: true }).click();
   await expect(page.getByText('Informe a comarca ou unidade judiciária.')).toBeVisible();
   await page.getByLabel('Comarca / Unidade Judiciária').fill(' João Pessoa ');
   await page.getByLabel('Nome do comunicante').fill('Teste da oficina');
-  await page.getByLabel('Matrícula', { exact: true }).fill('TESTE-E2E');
   await page.getByRole('button', { name: 'Continuar', exact: true }).click();
   await page.getByLabel('Número da OAB').fill('inválida');
   await page.getByRole('button', { name: 'Continuar', exact: true }).click();
@@ -57,32 +74,42 @@ test('comunicante registra PDF, acompanha protocolo e encerra sessão', async ({
   await page.locator('input[type=file]').setInputFiles(pdf);
   await expect(page.locator('.file-item')).toHaveCount(1);
   await semOverflow(page);
+  // Uma sessão expirada durante o preenchimento não deve impedir o envio público.
+  await context.clearCookies();
   await page.getByRole('button', { name: 'Registrar denúncia', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Denúncia registrada' })).toBeVisible();
   const protocolo = (await page.locator('.confirmation__protocolo').innerText()).trim();
   expect(protocolo).toMatch(/^LP-\d{4}-\d{6,}$/);
   await page.getByRole('button', { name: 'Acompanhar este caso' }).click();
   await expect(page.getByRole('heading', { name: protocolo, exact: true })).toBeVisible();
-  await expect(page.locator('article')).toContainText('OAB PB12345');
-  const baixado = page.waitForEvent('download');
-  await page.locator('article a[download]').click();
-  expect(readFileSync((await (await baixado).path())!)).toEqual(readFileSync(pdf));
+  await expect(page.locator('article')).toContainText('Etapa atual: Novo');
+  await expect(page.locator('article')).not.toContainText('Teste da oficina');
+  await expect(page.locator('article a[download]')).toHaveCount(0);
+  const publico = await page.request.get(`/api/denuncias/protocolo/${protocolo}`);
+  expect(Object.keys(await publico.json()).sort()).toEqual(['dataAtualizacao', 'dataCriacao', 'numeroProtocolo', 'status', 'statusDescricao']);
   await page.reload();
   await expect(page.getByRole('heading', { name: protocolo, exact: true })).toBeVisible();
   await semOverflow(page);
   await page.screenshot({ path: info.outputPath('acompanhamento.png'), fullPage: true });
-  await page.getByLabel('Número de protocolo').fill('LP-SEED-000001');
+  await page.getByLabel('Número de protocolo').fill('LP-2026-999999999');
   await page.getByRole('button', { name: 'Consultar', exact: true }).click();
   await expect(page.getByRole('alert')).toContainText('Protocolo não encontrado');
-  await page.getByRole('button', { name: 'Sair (comunicante)' }).click();
-  await expect(page).toHaveURL(/\/entrar/);
+  await entrar(page);
+  await page.getByRole('button').filter({ hasText: protocolo }).click();
+  await expect(page.getByRole('dialog')).toContainText('Teste da oficina');
+  const baixado = page.waitForEvent('download');
+  await page.getByRole('dialog').locator('a[download]').click();
+  expect(readFileSync((await (await baixado).path())!)).toEqual(readFileSync(pdf));
+  await page.keyboard.press('Escape');
+  await page.getByRole('button', { name: 'Sair (analista)' }).click();
+  await expect(page).toHaveURL(/\/denunciar/);
   await page.goto('/acompanhar');
-  await expect(page).toHaveURL(/\/entrar/);
+  await expect(page).toHaveURL(/\/acompanhar$/);
   expect(falhas).toEqual([]);
 });
 
 test('analista atualiza análise, audita e impede sobrescrita concorrente', async ({ page, context }, info) => {
-  await entrar(page, 'analista');
+  await entrar(page);
   await expect(page.locator('.kpi-card__value').first()).toHaveText(/\d+/);
   await page.getByLabel('Período dos indicadores').selectOption('TODOS');
   await expect(page.locator('.kanban__card').first()).toBeVisible();
@@ -120,7 +147,7 @@ test('analista atualiza análise, audita e impede sobrescrita concorrente', asyn
 });
 
 test('falha da API não aparece como indicadores zerados e permite tentar novamente', async ({ page }) => {
-  await entrar(page, 'analista');
+  await entrar(page);
   await expect(page.locator('.kpi-card')).toHaveCount(3);
   await page.route('**/api/dashboard/kpis*', rota => rota.fulfill({ status: 503, contentType: 'application/json', body: '{}' }));
   await page.getByLabel('Período dos indicadores').selectOption('MES');
@@ -129,4 +156,33 @@ test('falha da API não aparece como indicadores zerados e permite tentar novame
   await page.unroute('**/api/dashboard/kpis*');
   await page.getByRole('button', { name: 'Tentar novamente' }).click();
   await expect(page.locator('.kpi-card')).toHaveCount(3);
+});
+
+test('recupera conexão inicial com API e permite entrar sem recarregar a página', async ({ page }) => {
+  await page.route('**/api/session', rota => rota.fulfill({ status: 503, contentType: 'application/json', body: '{}' }));
+  await page.goto('/entrar');
+  await expect(page.getByRole('alert')).toContainText('Não foi possível conectar à API');
+  await page.unroute('**/api/session');
+  await page.getByRole('button', { name: 'Tentar conectar', exact: true }).click();
+  await expect(page.locator('.demo-access')).toContainText('oficina-analista');
+  await page.getByLabel('Usuário', { exact: true }).fill('analista');
+  await page.getByLabel('Senha', { exact: true }).fill('oficina-analista');
+  await page.getByRole('button', { name: 'Entrar', exact: true }).click();
+  await expect(page).toHaveURL(/\/painel$/);
+  await expect(page.locator('.kpi-card')).toHaveCount(3);
+});
+
+test('sessão gerencial expirada permite autenticar novamente e preserva canal público', async ({ page, context }) => {
+  await entrar(page);
+  await expect(page.locator('.kpi-card')).toHaveCount(3);
+  await context.clearCookies();
+  await page.getByLabel('Período dos indicadores').selectOption('MES');
+  await expect(page).toHaveURL(/\/entrar/);
+  await page.getByLabel('Usuário', { exact: true }).fill('analista');
+  await page.getByLabel('Senha', { exact: true }).fill('oficina-analista');
+  await page.getByRole('button', { name: 'Entrar', exact: true }).click();
+  await expect(page).toHaveURL(/\/painel$/);
+  await expect(page.locator('.kpi-card')).toHaveCount(3);
+  await page.getByRole('button', { name: 'Sair (analista)' }).click();
+  await expect(page.getByRole('heading', { name: 'Reportar padrão suspeito' })).toBeVisible();
 });

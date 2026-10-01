@@ -13,11 +13,13 @@ Requer Docker e Docker Compose:
 docker compose up -d --no-build
 ```
 
-Acesse [http://localhost:4200](http://localhost:4200). Contas da demonstração:
+Acesse [http://localhost:4200](http://localhost:4200) ou
+[http://127.0.0.1:4200](http://127.0.0.1:4200). O canal de denúncias é público:
+registrar e acompanhar por protocolo não exige conta. Apenas a área gerencial
+exige autenticação. Conta da demonstração:
 
 | Usuário | Senha | Acesso |
 | --- | --- | --- |
-| `comunicante` | `oficina-comunicante` | Registrar e acompanhar seus casos |
 | `analista` | `oficina-analista` | Registrar, consultar a fila, analisar e consultar indicadores |
 
 Esse Compose utiliza o perfil `demo`, com 55 casos fictícios. A primeira carga
@@ -57,8 +59,12 @@ a senha de um usuário já existente em um volume inicializado.
 
 ## Fluxos disponíveis
 
-- `/entrar`: login com sessão de 30 minutos, cookies HttpOnly/SameSite e CSRF.
+- `/entrar`: login da equipe gerencial, com sessão de 30 minutos, cookies
+  HttpOnly/SameSite e CSRF. O formulário permite tentar novamente após falha
+  de conexão ou senha incorreta. A conta de demonstração aparece na tela.
 - `/denunciar`: quatro passos para origem, OAB e CPF/CNPJ, tipologia e evidências.
+  Acesso público, sem login; matrícula opcional. O token CSRF é renovado antes
+  de enviar para atender formulários que ficaram abertos além da duração da sessão.
   Exige 3 a 5 processos distintos na máscara CNJ e relato de até 500 caracteres.
   CPF/CNPJ têm dígitos verificadores validados; a máscara CNJ não verifica o
   dígito do processo. OAB é normalizada, sem consulta ao cadastro da Ordem.
@@ -68,9 +74,10 @@ a senha de um usuário já existente em um volume inicializado.
   com o caso na mesma transação e disponíveis para download autorizado. A
   validação verifica extensão, assinatura e final do PDF; não substitui análise
   de conteúdo ou antivírus. Nomes antigos sem arquivo são identificados como legado.
-- `/acompanhar`: consulta por protocolo. Comunicantes acessam apenas seus registros;
-  analistas consultam a fila completa. Casos legados sem autor ficam com analistas.
-- `/painel`: indicadores por mês, ano ou histórico, Top 10 por OAB ou CPF/CNPJ,
+- `/acompanhar`: consulta pública por protocolo, retornando somente etapa atual,
+  data do registro e última atualização. Dados pessoais, processos, PDFs, notas
+  técnicas e histórico interno ficam restritos à equipe gerencial, inclusive na API.
+- `/painel`: acesso restrito à equipe gerencial. Indicadores por mês, ano ou histórico, Top 10 por OAB ou CPF/CNPJ,
   concentração por comarca, tipologias e 12 semanas de tendência com zeros.
   A fila usa paginação e filtros por etapa sobre todo o histórico, independentemente
   do período dos indicadores. Falhas de conexão aparecem como erro, com nova tentativa.
@@ -150,9 +157,9 @@ npm start
 
 `compose.production.yml` desativa o perfil demo, exige senhas fornecidas pelo
 ambiente e usa um volume de banco separado. Defina `DB_PASSWORD`,
-`APP_REPORTER_PASSWORD`, `APP_ANALYST_PASSWORD` e `CORS_ORIGINS` (origem HTTPS).
-As senhas das contas precisam ter ao menos 12 caracteres. Usuários podem ser
-alterados com `APP_REPORTER_USER` e `APP_ANALYST_USER`.
+`APP_ANALYST_PASSWORD` e `CORS_ORIGINS` (origem HTTPS).
+A senha gerencial precisa ter ao menos 12 caracteres. O usuário pode ser
+alterado com `APP_ANALYST_USER`. Não há conta de comunicante.
 
 ```sh
 ./scripts/build.ps1
@@ -163,7 +170,7 @@ O acesso exige um proxy HTTPS: nesse modo o cookie é `Secure`. Os nomes dos
 containers e as portas são os mesmos da demonstração; encerre a demonstração
 antes de usar a configuração no mesmo host. Não grave credenciais no repositório.
 
-A autenticação local possui duas contas configuráveis e serve à execução e
+A autenticação local possui uma conta gerencial configurável e serve à execução e
 validação do fluxo. Uso institucional ainda exige integrar SSO, provisionamento
 de usuários, política de acesso, operação e revisão dos especialistas.
 

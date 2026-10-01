@@ -1,6 +1,5 @@
 app:
   auth:
-    reporter-password: senha-teste-comunicante
     analyst-password: senha-teste-analista
 spring:
   sql:

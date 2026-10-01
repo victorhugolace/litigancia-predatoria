@@ -1,23 +1,28 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, switchMap, throwError } from 'rxjs';
+import { AuthService } from './auth.service';
 import { environment } from '../../../environments/environment';
-import { DenunciaRequest, DenunciaResponse, StatusDenuncia, PaginaDenuncias, StatusUpdateRequest } from '../models/denuncia.model';
+import { DenunciaRequest, DenunciaResponse, AcompanhamentoResponse, StatusDenuncia, PaginaDenuncias, StatusUpdateRequest } from '../models/denuncia.model';
 
 @Injectable({ providedIn: 'root' })
 export class DenunciaService {
   private readonly baseUrl = `${environment.apiUrl}/denuncias`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private auth: AuthService) {}
 
   criar(request: DenunciaRequest, arquivos: File[] = []): Observable<DenunciaResponse> {
+    let body: FormData | DenunciaRequest = request;
     if (arquivos.length) {
       const form = new FormData();
       form.append('dados', new Blob([JSON.stringify(request)], { type: 'application/json' }));
       arquivos.forEach(arquivo => form.append('arquivos', arquivo, arquivo.name));
-      return this.http.post<DenunciaResponse>(this.baseUrl, form);
+      body = form;
     }
-    return this.http.post<DenunciaResponse>(this.baseUrl, request);
+    // O formulário público pode ficar aberto além dos 30 minutos da sessão CSRF.
+    return this.auth.restaurar().pipe(switchMap(sessao => sessao.csrfToken
+      ? this.http.post<DenunciaResponse>(this.baseUrl, body)
+      : throwError(() => new Error('Não foi possível conectar à aplicação. Tente novamente.'))));
   }
 
   urlDocumento(denunciaId: number, documentoId: string): string {
@@ -36,8 +41,8 @@ export class DenunciaService {
     return this.http.get<DenunciaResponse>(`${this.baseUrl}/${id}`);
   }
 
-  acompanhar(protocolo: string): Observable<DenunciaResponse> {
-    return this.http.get<DenunciaResponse>(`${this.baseUrl}/protocolo/${encodeURIComponent(protocolo)}`);
+  acompanhar(protocolo: string): Observable<AcompanhamentoResponse> {
+    return this.http.get<AcompanhamentoResponse>(`${this.baseUrl}/protocolo/${encodeURIComponent(protocolo)}`);
   }
 
   atualizarStatus(id: number, payload: StatusUpdateRequest): Observable<DenunciaResponse> {

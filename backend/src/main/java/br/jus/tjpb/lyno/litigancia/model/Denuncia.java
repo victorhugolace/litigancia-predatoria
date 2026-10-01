@@ -29,7 +29,7 @@ public class Denuncia {
     @Column(name = "nome_comunicante", nullable = false, length = 150)
     private String nomeComunicante;
 
-    @Column(name = "matricula_comunicante", nullable = false, length = 30)
+    @Column(name = "matricula_comunicante", length = 30)
     private String matriculaComunicante;
 
     // --- Bloco 2: Alvo da suspeita ---

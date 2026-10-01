@@ -17,7 +17,6 @@ public class DenunciaRequest {
     @Size(max = 150)
     private String nomeComunicante;
 
-    @NotBlank(message = "Informe a matrícula do comunicante")
     @Size(max = 30)
     private String matriculaComunicante;
 

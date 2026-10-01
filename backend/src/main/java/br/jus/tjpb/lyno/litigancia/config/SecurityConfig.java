@@ -16,19 +16,16 @@ public class SecurityConfig {
     org.springframework.security.crypto.password.PasswordEncoder passwordEncoder() { return new BCryptPasswordEncoder(); }
 
     @Bean
-    UserDetailsService users(@Value("${app.auth.reporter-user}") String reporter,
-                            @Value("${app.auth.reporter-password}") String reporterPassword,
-                            @Value("${app.auth.analyst-user}") String analyst,
+    UserDetailsService users(@Value("${app.auth.analyst-user}") String analyst,
                             @Value("${app.auth.analyst-password}") String analystPassword,
                             org.springframework.security.crypto.password.PasswordEncoder encoder) {
-        if (!reporter.matches("[A-Za-z0-9._-]{3,120}") || !analyst.matches("[A-Za-z0-9._-]{3,120}") || reporter.equals(analyst)) {
-            throw new IllegalStateException("Defina usuários distintos e válidos para comunicante e analista");
+        if (!analyst.matches("[A-Za-z0-9._-]{3,120}")) {
+            throw new IllegalStateException("Defina um usuário válido para a área gerencial");
         }
-        if (reporterPassword.length() < 12 || analystPassword.length() < 12) {
-            throw new IllegalStateException("Defina APP_REPORTER_PASSWORD e APP_ANALYST_PASSWORD com pelo menos 12 caracteres");
+        if (analystPassword.length() < 12) {
+            throw new IllegalStateException("Defina APP_ANALYST_PASSWORD com pelo menos 12 caracteres");
         }
         return new InMemoryUserDetailsManager(
-                User.withUsername(reporter).password(encoder.encode(reporterPassword)).roles("COMUNICANTE").build(),
                 User.withUsername(analyst).password(encoder.encode(analystPassword)).roles("ANALISTA").build());
     }
 
@@ -37,8 +34,8 @@ public class SecurityConfig {
         http.cors(Customizer.withDefaults())
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/session", "/api/login", "/error").permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/denuncias").hasAnyRole("COMUNICANTE", "ANALISTA")
-                .requestMatchers(HttpMethod.GET, "/api/denuncias/*", "/api/denuncias/protocolo/*", "/api/denuncias/*/documentos/*").authenticated()
+                .requestMatchers(HttpMethod.POST, "/api/denuncias").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/denuncias/protocolo/*").permitAll()
                 .requestMatchers("/api/denuncias/**", "/api/dashboard/**").hasRole("ANALISTA")
                 .anyRequest().denyAll())
             .formLogin(login -> login.loginProcessingUrl("/api/login")
