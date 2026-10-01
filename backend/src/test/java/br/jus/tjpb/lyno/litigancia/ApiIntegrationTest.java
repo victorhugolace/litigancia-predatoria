@@ -19,8 +19,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@org.springframework.test.context.ActiveProfiles("test")
 @org.springframework.security.test.context.support.WithMockUser(username = "analista", roles = "ANALISTA")
 class ApiIntegrationTest {
+    @org.springframework.test.context.DynamicPropertySource
+    static void exigirBancoDeTeste(org.springframework.test.context.DynamicPropertyRegistry registry) {
+        if (!"litigancia_test".equals(System.getenv("DB_NAME"))) {
+            throw new IllegalStateException("Execute a suíte com compose.test.yml: DB_NAME deve ser litigancia_test");
+        }
+    }
     @Autowired MockMvc mvc;
     @Autowired DenunciaRepository repository;
     @Autowired DenunciaService service;
