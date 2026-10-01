@@ -1,0 +1,17 @@
+# Usar junto com docker-compose.yml e um banco separado da demonstracao.
+# As senhas sao obrigatorias e o backend exige no minimo 12 caracteres.
+services:
+  db:
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Defina DB_PASSWORD para o banco institucional}
+  backend:
+    environment:
+      SPRING_PROFILES_ACTIVE: production
+      DB_PASSWORD: ${DB_PASSWORD:?Defina DB_PASSWORD para o banco institucional}
+      APP_REPORTER_PASSWORD: ${APP_REPORTER_PASSWORD:?Defina APP_REPORTER_PASSWORD}
+      APP_ANALYST_PASSWORD: ${APP_ANALYST_PASSWORD:?Defina APP_ANALYST_PASSWORD}
+      CORS_ORIGINS: ${CORS_ORIGINS:?Defina a origem HTTPS da aplicacao}
+      SESSION_COOKIE_SECURE: "true"
+volumes:
+  litigancia_pgdata:
+    name: litigancia_production_pgdata
