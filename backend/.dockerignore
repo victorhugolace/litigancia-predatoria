@@ -1,3 +1,6 @@
-target
-.angular
-.env
+**
+!pom.xml
+!src/
+!src/**
+!Dockerfile
+!.dockerignore

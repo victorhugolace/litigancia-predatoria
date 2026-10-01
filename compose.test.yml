@@ -1,6 +1,9 @@
 services:
   db:
     image: postgres:16-alpine
+    cpus: 0.50
+    mem_limit: 256m
+    memswap_limit: 256m
     environment:
       POSTGRES_DB: litigancia_test
       POSTGRES_USER: test
@@ -13,12 +16,18 @@ services:
     tmpfs:
       - /var/lib/postgresql/data
   backend-test:
+    image: litigancia-validacao-backend-test:latest
+    cpus: 1.0
+    mem_limit: 1g
+    memswap_limit: 1g
     build:
       context: ./backend
       target: test
     volumes:
       - maven-test-cache:/root/.m2
     environment:
+      MAVEN_OPTS: "-Xmx256m -XX:ActiveProcessorCount=1"
+      JAVA_TOOL_OPTIONS: "-XX:MaxRAMPercentage=40.0 -XX:ActiveProcessorCount=1"
       DB_HOST: db
       DB_NAME: litigancia_test
       DB_USER: test

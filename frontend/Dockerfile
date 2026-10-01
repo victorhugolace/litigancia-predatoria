@@ -1,5 +1,6 @@
 FROM node:20-alpine AS build
 WORKDIR /app
+ENV NODE_OPTIONS=--max-old-space-size=768 NG_BUILD_MAX_WORKERS=1
 COPY package.json package-lock.json ./
 RUN npm ci
 COPY . .

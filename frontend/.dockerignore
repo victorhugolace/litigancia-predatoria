@@ -1,6 +1,11 @@
-node_modules
-dist
-.angular
-test-results
-playwright-report
-.env
+**
+!package.json
+!package-lock.json
+!angular.json
+!tsconfig.json
+!tsconfig.app.json
+!src/
+!src/**
+!nginx.conf
+!Dockerfile
+!.dockerignore

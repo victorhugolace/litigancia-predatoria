@@ -1,45 +1,72 @@
 services:
   db:
     image: postgres:16-alpine
+    cpus: 0.50
+    mem_limit: 256m
+    memswap_limit: 256m
+    pids_limit: 100
     container_name: litigancia-db
     restart: unless-stopped
     environment:
-      POSTGRES_DB: litigancia_predatoria
-      POSTGRES_USER: lyno
-      POSTGRES_PASSWORD: lyno
+      POSTGRES_DB: ${DB_NAME:-litigancia_predatoria}
+      POSTGRES_USER: ${DB_USER:-lyno}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-lyno}
     ports:
       - "127.0.0.1:5432:5432"
     volumes:
       - litigancia_pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U lyno -d litigancia_predatoria"]
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 5s
       timeout: 5s
       retries: 10
 
   backend:
+    image: litigancia-predatoria-backend:latest
     build: ./backend
+    cpus: 0.75
+    mem_limit: 768m
+    memswap_limit: 768m
+    pids_limit: 150
     container_name: litigancia-backend
     restart: unless-stopped
     depends_on:
       db:
         condition: service_healthy
     environment:
+      JAVA_TOOL_OPTIONS: "-XX:MaxRAMPercentage=60.0 -XX:ActiveProcessorCount=1"
       DB_HOST: db
       DB_PORT: 5432
-      DB_NAME: litigancia_predatoria
-      DB_USER: lyno
-      DB_PASSWORD: lyno
-      SPRING_PROFILES_ACTIVE: ${APP_PROFILE:-demo}
+      DB_NAME: ${DB_NAME:-litigancia_predatoria}
+      DB_USER: ${DB_USER:-lyno}
+      DB_PASSWORD: ${DB_PASSWORD:-lyno}
+      SPRING_PROFILES_ACTIVE: demo
+      APP_REPORTER_USER: ${APP_REPORTER_USER:-comunicante}
+      APP_REPORTER_PASSWORD: ${APP_REPORTER_PASSWORD:-oficina-comunicante}
+      APP_ANALYST_USER: ${APP_ANALYST_USER:-analista}
+      APP_ANALYST_PASSWORD: ${APP_ANALYST_PASSWORD:-oficina-analista}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:4200}
     ports:
       - "127.0.0.1:8080:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:8080/api/session > /dev/null"]
+      interval: 3s
+      timeout: 3s
+      retries: 60
+      start_period: 30s
 
   frontend:
+    image: litigancia-predatoria-frontend:latest
     build: ./frontend
+    cpus: 0.25
+    mem_limit: 64m
+    memswap_limit: 64m
+    pids_limit: 50
     container_name: litigancia-frontend
     restart: unless-stopped
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
     ports:
       - "127.0.0.1:4200:80"
 
