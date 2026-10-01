@@ -5,7 +5,7 @@ Referência: **Esqueleto das entregas da Oficina de Litigância Predatória.pdf*
 | Parte do documento | Implementação local |
 | --- | --- |
 | Identificação da origem | Comarca, nome e matrícula; identidade institucional depende de SSO |
-| Alvo da suspeita | OAB obrigatória; CPF/CNPJ opcional; normalização de identificadores |
+| Alvo da suspeita | OAB obrigatória; CPF/CNPJ opcional, inclusive CNPJ alfanumérico; normalização e dígitos verificadores |
 | Tipologia | Seleção única das seis categorias; descrição obrigatória em Outros |
 | Materialidade | De 3 a 5 processos distintos com máscara CNJ, relato de 500 caracteres, PDFs |
 | Visão executiva | Indicadores do período selecionado e ranking por OAB ou CPF/CNPJ |
@@ -27,6 +27,8 @@ indicada no documento. A aplicação registra suspeitas e não decide se há fra
 ## Dados e implantação
 
 O perfil `demo` carrega registros fictícios para a oficina. Fora desse perfil, não há seed.
+Há autenticação local por sessão, com perfis comunicante e analista, autoria e consulta
+restrita por caso. As duas contas configuráveis não substituem a identidade institucional.
 As datas do seed são calculadas em relação à semana de sua primeira carga; reiniciar a aplicação
 não modifica registros existentes. Nunca utilizar o banco demonstrativo como base institucional.
 
@@ -36,9 +38,15 @@ ser validada num banco de teste e, para implantação institucional, sobre uma c
 ## Validação reproduzível
 
 ```sh
-docker compose -p litigancia-validacao -f compose.test.yml up --build --abort-on-container-exit --exit-code-from backend-test
+./scripts/build.ps1 -Target api-test
+docker compose -p litigancia-validacao -f compose.test.yml up --no-build --abort-on-container-exit --exit-code-from backend-test
 docker compose -p litigancia-validacao -f compose.test.yml down
 ```
 
 Esse projeto Compose usa um PostgreSQL temporário independente, sem portas publicadas e sem
 volume persistente. Não execute testes destrutivos no banco da aplicação.
+
+Os fluxos de navegador possuem outra composição isolada, `compose.e2e.yml`, para
+Chromium em desktop e celular. `scripts/validate.ps1` executa as duas suítes.
+O build possui limite próprio de CPU/memória e execução sequencial; os limites dos
+containers são descritos no README. O Docker Desktop/WSL tem consumo adicional.
