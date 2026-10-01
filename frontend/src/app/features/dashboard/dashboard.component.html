@@ -50,7 +50,7 @@
         <h2>Ranking de reincidência (Top 10)</h2>
         <span class="panel__hint">Principal gatilho para a Corregedoria agir</span>
       </div>
-      <table class="ranking-table">
+      <div class="ranking-scroll"><table class="ranking-table">
         <thead>
           <tr><th>#</th><th>{{ porDocumento ? 'CPF / CNPJ' : 'OAB' }}</th><th>Denúncias</th><th>Comarcas envolvidas</th></tr>
         </thead>
@@ -62,7 +62,7 @@
             <td>{{ item.comarcasEnvolvidas }}</td>
           </tr>
         </tbody>
-      </table>
+      </table></div>
       <p *ngIf="ranking().length === 0">Nenhum alerta para esse agrupamento no período.</p>
     </section>
 
@@ -93,7 +93,8 @@
           <span class="panel__hint">Orienta as Notas Técnicas do Centro de Inteligência</span>
         </div>
         <div class="chart-box">
-          <canvas #tipologiaCanvas></canvas>
+          <canvas #tipologiaCanvas role="img" aria-label="Distribuição de denúncias por tipologia" aria-describedby="dadosTipologia"></canvas>
+          <ul id="dadosTipologia" class="dados-grafico"><li *ngFor="let item of tipologias()">{{ item.descricao }}: {{ item.total }} denúncias</li></ul>
         </div>
       </section>
     </div>
@@ -104,7 +105,8 @@
         <span class="panel__hint">Últimas 12 semanas · {{ periodos[periodo] }}</span>
       </div>
       <div class="chart-box chart-box--wide">
-        <canvas #tendenciaCanvas></canvas>
+        <canvas #tendenciaCanvas role="img" aria-label="Tendência semanal de alertas" aria-describedby="dadosTendencia"></canvas>
+        <ul id="dadosTendencia" class="dados-grafico"><li *ngFor="let item of tendencia()">Semana de {{ item.semana }}: {{ item.total }} alertas</li></ul>
       </div>
     </section>
 
@@ -160,7 +162,7 @@
       <div><span>Status</span><strong>{{ d.statusDescricao }}</strong></div>
       <div><span>Comunicante</span><strong>{{ d.nomeComunicante }}</strong></div>
       <div><span>Registrado em</span><strong>{{ formatarData(d.dataCriacao) }}</strong></div>
-      <div *ngIf="d.volumeProcessualEstimado"><span>Volume estimado</span><strong>{{ d.volumeProcessualEstimado }} processos</strong></div>
+      <div *ngIf="d.volumeProcessualEstimado != null"><span>Volume estimado</span><strong>{{ d.volumeProcessualEstimado }} processos</strong></div>
     </div>
 
     <div class="drilldown__section">
@@ -188,11 +190,12 @@
     </section>
     <p *ngIf="carregandoDetalhe()">Carregando detalhes…</p>
     <div *ngIf="erroDetalhe()" class="dash__erro" role="alert">
-      <p>{{ erroDetalhe() }}</p><button class="lp-btn lp-btn--ghost" (click)="recarregarDetalhe()">Recarregar caso</button>
+      <p>{{ erroDetalhe() }}</p><button class="lp-btn lp-btn--ghost" (click)="recarregarDetalhe()" [disabled]="salvando()">Recarregar caso</button>
     </div>
     <p *ngIf="sucessoEdicao()" role="status">Análise atualizada.</p>
     <form [formGroup]="edicao" (ngSubmit)="salvarEdicao()" *ngIf="!carregandoDetalhe() && !erroDetalhe()" class="edicao-caso">
       <h3>Atualizar análise</h3>
+      <fieldset [disabled]="salvando()">
       <label for="etapaCaso">Etapa</label>
       <select id="etapaCaso" formControlName="status"><option *ngFor="let etapa of statusOrder" [value]="etapa">{{ statusLabels[etapa] }}</option></select>
       <label for="volumeCaso">Volume processual estimado</label><input id="volumeCaso" type="number" min="0" step="1" formControlName="volume">
@@ -200,6 +203,7 @@
       <label for="notaCaso">Resumo da nota técnica</label><textarea id="notaCaso" rows="4" maxlength="800" formControlName="nota"></textarea>
       <p class="field__error" *ngIf="edicao.invalid && edicao.touched">Informe estimativas inteiras válidas e uma nota de até 800 caracteres.</p>
       <button class="lp-btn lp-btn--primary" type="submit" [disabled]="salvando()">{{ salvando() ? 'Salvando…' : 'Salvar análise' }}</button>
+      </fieldset>
     </form>
     <section class="drilldown__section" *ngIf="d.historico.length">
       <h3>Histórico de acompanhamento</h3>

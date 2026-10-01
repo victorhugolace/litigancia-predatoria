@@ -20,6 +20,8 @@
         class="stepper__item"
         [class.is-active]="currentStep() === i"
         [class.is-done]="currentStep() > i"
+        role="button" tabindex="0" [attr.aria-current]="currentStep() === i ? 'step' : null"
+        (keydown.enter)="irParaPasso(i)" (keydown.space)="$event.preventDefault(); irParaPasso(i)"
         (click)="irParaPasso(i)">
       <span class="stepper__badge">{{ i + 1 }}</span>
       <span class="stepper__label">
@@ -123,6 +125,7 @@
         <div class="processo-row" *ngFor="let ctrl of processosArray.controls; let i = index">
           <span class="processo-row__index">{{ i + 1 }}</span>
           <input type="text"
+                 [attr.aria-label]="'Processo paradigma ' + (i + 1)"
                  [formControlName]="i"
                  (input)="aplicarMascaraCNJ(i, $event)"
                  maxlength="25"

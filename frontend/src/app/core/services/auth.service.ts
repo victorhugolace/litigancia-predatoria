@@ -1,6 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { catchError, of, switchMap, tap, throwError } from 'rxjs';
+import { catchError, of, switchMap, tap, throwError, timeout } from 'rxjs';
 
 export interface Sessao { autenticado: boolean; usuario: string | null; perfis: string[]; csrfToken: string; demo: boolean; }
 const vazia: Sessao = { autenticado: false, usuario: null, perfis: [], csrfToken: '', demo: false };
@@ -15,7 +15,7 @@ export class AuthService {
   limpar(): void { this.sessao.set({ ...vazia, demo: this.sessao().demo }); }
 
   restaurar() {
-    return this.http.get<Sessao>('/api/session').pipe(tap(sessao => {
+    return this.http.get<Sessao>('/api/session').pipe(timeout(15000), tap(sessao => {
       this.sessao.set(sessao); this.falhaConexao.set(false);
     }), catchError(() => { this.limpar(); this.falhaConexao.set(true); return of(this.sessao()); }));
   }

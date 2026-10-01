@@ -115,6 +115,7 @@ button {
   display: flex;
   align-items: center;
   gap: 16px;
+  min-width: 0;
 }
 
 .shell__coat-of-arms {
@@ -149,6 +150,8 @@ button {
 .shell__nav {
   display: flex;
   gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
 
   a {
     padding: 8px 18px;
@@ -280,4 +283,8 @@ button {
   &:hover:not(:disabled) {
     background: var(--lp-pje-blue-darker);
   }
+}
+
+@media (max-width: 1100px) {
+  .shell__topbar { flex-wrap: wrap; }
 }

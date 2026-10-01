@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild, signal, inject } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild, signal, inject } from '@angular/core';
 import { forkJoin, Subscription } from 'rxjs';
 import { FormsModule, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Chart, registerables } from 'chart.js';
@@ -19,7 +19,7 @@ Chart.register(...registerables);
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
-export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
+export class DashboardComponent implements OnInit, OnDestroy {
   @ViewChild('tipologiaCanvas') tipologiaCanvas?: ElementRef<HTMLCanvasElement>;
   @ViewChild('tendenciaCanvas') tendenciaCanvas?: ElementRef<HTMLCanvasElement>;
 
@@ -59,6 +59,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   private tendenciaChart?: Chart;
   private requisicao?: Subscription;
   private chartTimer?: ReturnType<typeof setTimeout>;
+  private focusTimer?: ReturnType<typeof setTimeout>;
   private detalheRequest?: Subscription;
   private saveRequest?: Subscription;
   private focoAnterior?: HTMLElement;
@@ -102,13 +103,12 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  ngAfterViewInit(): void {}
-
   ngOnDestroy(): void {
     this.requisicao?.unsubscribe();
     this.detalheRequest?.unsubscribe();
     this.saveRequest?.unsubscribe();
     clearTimeout(this.chartTimer);
+    clearTimeout(this.focusTimer);
     this.tipologiaChart?.destroy();
     this.tendenciaChart?.destroy();
   }
@@ -125,7 +125,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     this.tipologiaChart = new Chart(this.tipologiaCanvas.nativeElement, {
       type: 'bar',
       data: {
-        labels: dados.map(d => d.descricao),
+        labels: dados.map(d => this.quebrarRotulo(d.descricao)),
         datasets: [{
           data: dados.map(d => d.total),
           backgroundColor: '#1c3a63',
@@ -199,12 +199,29 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     this.focoAnterior = document.activeElement as HTMLElement;
     this.denunciaSelecionada.set(denuncia);
     this.recarregarDetalhe();
-    setTimeout(() => document.querySelector<HTMLButtonElement>('.drilldown__close')?.focus());
+    this.focarModal('.drilldown__close');
+  }
+
+  private quebrarRotulo(texto: string): string[] {
+    const linhas: string[] = [];
+    let linha = '';
+    for (const palavra of texto.split(/\s+/)) {
+      if (linha && linha.length + palavra.length + 1 > 28) {
+        linhas.push(linha); linha = palavra;
+      } else { linha = linha ? `${linha} ${palavra}` : palavra; }
+    }
+    if (linha) linhas.push(linha);
+    return linhas;
+  }
+
+  private focarModal(seletor: string): void {
+    clearTimeout(this.focusTimer);
+    this.focusTimer = setTimeout(() => document.querySelector<HTMLElement>(seletor)?.focus());
   }
 
   recarregarDetalhe(): void {
     const denuncia = this.denunciaSelecionada();
-    if (!denuncia) return;
+    if (!denuncia || this.salvando()) return;
     this.detalheRequest?.unsubscribe();
     this.carregandoDetalhe.set(true);
     this.erroDetalhe.set(null);
@@ -215,6 +232,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
         this.edicao.reset({ status: d.status, volume: d.volumeProcessualEstimado ?? null,
           comarcas: d.comarcasAtingidas ?? null, nota: d.notaTecnicaResumo ?? '' });
         this.carregandoDetalhe.set(false);
+        this.focarModal('.drilldown__close');
       },
       error: () => { this.carregandoDetalhe.set(false); this.erroDetalhe.set('Não foi possível carregar os detalhes do caso.'); }
     });
@@ -237,12 +255,14 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
       next: atualizado => {
         this.denunciaSelecionada.set(atualizado);
         this.salvando.set(false); this.sucessoEdicao.set(true);
+        this.focarModal('.drilldown button[type="submit"]');
         this.carregar();
       },
       error: e => {
         this.salvando.set(false);
         this.erroDetalhe.set(e.status === 409 ? 'Outro analista alterou este caso. Recarregue os dados antes de editar novamente.'
           : e.error?.mensagem ?? 'Não foi possível salvar a análise.');
+        this.focarModal('.drilldown .dash__erro button');
       }
     });
   }
@@ -267,6 +287,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.salvando()) return;
     this.detalheRequest?.unsubscribe();
     this.denunciaSelecionada.set(null);
+    clearTimeout(this.focusTimer);
     this.focoAnterior?.focus();
   }
 
